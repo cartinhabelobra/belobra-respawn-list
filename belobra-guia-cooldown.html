@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Como Funciona o Cooldown</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  article h2{font-size:18px;color:var(--accent-teal);margin:32px 0 12px;}
+  article p{font-size:15px;line-height:1.75;color:var(--text-primary);margin-bottom:14px;}
+
+  ul.feature-list{list-style:none;margin:14px 0;}
+  ul.feature-list li{font-size:14px;color:var(--text-primary);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--border);}
+  ul.feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);font-weight:700;}
+  ul.feature-list li:last-child{border-bottom:none;}
+  ul.feature-list li b{color:var(--text-primary);}
+
+  .warn-box{background:rgba(226,87,76,0.08);border:1px solid rgba(226,87,76,0.3);border-radius:10px;padding:16px 18px;font-size:14px;color:var(--text-primary);margin:18px 0;}
+  .warn-box b{color:var(--accent-red);}
+
+  .cta{margin-top:32px;padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{display:inline-block;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Cooldown entre hunts: para que serve</h1>
+    <p class="lead">O motivo por tras do intervalo obrigatório entre uma fila e outra, e como esse mecanismo evita que uma pessoa ou grupo monopolize os respawns.</p>
+    <div class="meta-line"><span>Publicado em 12/03/2026</span><span>Atualizado em 15/04/2026</span></div>
+
+    <h2>O que e o cooldown</h2>
+    <p>O cooldown e um tempo de espera obrigatório entre uma fila e outra. Ele existe pra garantir que os respawns girem de forma justa e pra impedir que um jogador ou grupo fique entrando na mesma fila repetidas vezes assim que sai dela.</p>
+
+    <h2>Quando ele entra em ação</h2>
+    <p>O cooldown de 5 minutos e acionado nestas situacoes:</p>
+    <ul class="feature-list">
+      <li>Sair de uma fila por vontade própria antes de ser chamado</li>
+      <li>Encerrar a hunt antes do tempo acabar</li>
+      <li>Não confirmar a entrada a tempo quando chegar sua vez (o prazo e de 5 minutos)</li>
+      <li>Ser removido por causa de um Report AFK que você não respondeu</li>
+    </ul>
+
+    <h2>Por que isso e necessário</h2>
+    <p>Sem esse intervalo, alguns problemas apareceriam rapido:</p>
+    <ul class="feature-list">
+      <li><b>Monopólio de respawn:</b> um jogador poderia sair e entrar de novo na mesma fila na hora seguinte, ficando praticamente dono do local</li>
+      <li><b>Uso estrategico do sistema de aceite:</b> alguém poderia recusar filas de proposito, esperando o horário que quisesse</li>
+      <li><b>Grupos revezando posição:</b> um time coordenado poderia se alternar na fila e segurar o respawn por tempo indeterminado</li>
+    </ul>
+    <p>Cinco minutos foi o meio-termo encontrado: curto o suficiente pra não incomodar quem está jogando de forma normal, mas longo o bastante pra evitar essas brechas e dar chance real pros outros jogadores.</p>
+
+    <h2>Outras protecoes contra monopólio</h2>
+    <p>Além do cooldown, existem outras camadas de proteção no sistema:</p>
+    <ul class="feature-list">
+      <li><b>Limite de tempo por hunt:</b> no máximo 3 horas, mais 15 minutos de refill, por sessão</li>
+      <li><b>Sem revezamento entre Main e Maker:</b> não vale usar os dois personagens do mesmo jogador pra segurar posições seguidas na mesma fila</li>
+      <li><b>Monitoramento de padroes:</b> a administracao acompanha comportamentos suspeitos de membros da mesma PT se revezando na fila</li>
+    </ul>
+
+    <div class="warn-box"><b>Atenção:</b> qualquer tentativa de burlar essas protecoes — com varios personagens, contas de terceiros ou combinado com o grupo — resulta em banimento permanente do sistema.</div>
+
+    <h2>Dicas pra organizar seu tempo</h2>
+    <ul class="feature-list">
+      <li>Planeje a hunt com antecedencia — confira a fila antes de escolher o respawn</li>
+      <li>Se já sabe que vai parar de jogar, encerre a hunt mais cedo pra liberar a vaga logo</li>
+      <li>Aproveite o cooldown pra se organizar: comprar suprimento, arrumar inventario</li>
+      <li>Experimente horários alternativos — de madrugada e de manha costuma ter menos gente na fila</li>
+    </ul>
+
+    <div class="cta">
+      <p>Com o cooldown explicado, agora e só voltar pra fila do respawn que você quer.</p>
+      <a href="belobra-respawn-list.html">Ver lista de respawns</a>
+    </div>
+  </article>
+</main>
+
+</body>
+</html>

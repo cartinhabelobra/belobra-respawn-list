@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Como Funciona o Sistema de Filas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  article h2{font-size:18px;color:var(--accent-teal);margin:32px 0 12px;}
+  article h3{font-size:15px;color:var(--accent-gold);margin:22px 0 8px;}
+  article p{font-size:15px;line-height:1.75;color:var(--text-primary);margin-bottom:14px;}
+
+  .stat-row{display:flex;gap:14px;margin:20px 0;flex-wrap:wrap;}
+  .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;flex:1;min-width:150px;text-align:center;}
+  .stat-box .num{font-size:22px;font-weight:700;color:var(--accent-gold);}
+  .stat-box .lbl{font-size:12px;color:var(--text-secondary);}
+
+  .step-block{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent-teal);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:16px 0;
+  }
+  .step-block h3{margin-top:0;color:var(--text-primary);font-size:16px;}
+  .step-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--pill-bg);color:var(--accent-teal);
+    font-size:12px;font-weight:700;margin-right:8px;
+  }
+
+  ul.feature-list{list-style:none;margin:12px 0;}
+  ul.feature-list li{font-size:14px;color:var(--text-primary);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--border);}
+  ul.feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);font-weight:700;}
+  ul.feature-list li:last-child{border-bottom:none;}
+
+  .tip-box{background:rgba(224,169,74,0.08);border:1px solid rgba(224,169,74,0.3);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--text-primary);margin:14px 0;}
+  .tip-box b{color:var(--accent-gold);}
+  .warn-box{background:rgba(226,87,76,0.08);border:1px solid rgba(226,87,76,0.3);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--text-primary);margin:14px 0;}
+  .warn-box b{color:var(--accent-red);}
+  .info-box{background:rgba(47,191,135,0.08);border:1px solid rgba(47,191,135,0.3);border-radius:10px;padding:14px 18px;font-size:14px;color:var(--text-primary);margin:14px 0;}
+  .info-box b{color:var(--accent-teal);}
+
+  .cta{margin-top:32px;padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{display:inline-block;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;}
+  .cta a.secondary{background:none;border:1px solid var(--border);color:var(--text-primary);margin-left:10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Como as filas de respawn funcionam de ponta a ponta</h1>
+    <p class="lead">Do momento em que você entra na fila até o encerramento da sua hunt: cada etapa do funcionamento automático do sistema explicada sem enrolacao.</p>
+    <div class="meta-line"><span>Publicado em 05/03/2026</span><span>Atualizado em 18/04/2026</span></div>
+
+    <h2>Visao geral</h2>
+    <p>O sistema de filas e o motor por tras da Cartinha Online. E ele quem garante que os respawns do servidor Belobra sejam usados de forma justa, sem conflito e com chances iguais pra todo mundo. Aqui vamos destrinchar cada etapa, desde entrar na fila até encerrar a hunt.</p>
+
+    <div class="stat-row">
+      <div class="stat-box"><div class="num">150+</div><div class="lbl">jogadores usando o sistema ao mesmo tempo, em média</div></div>
+    </div>
+    <p>Com esse volume de uso simultaneo, velocidade e confiabilidade viraram prioridade absoluta no desenvolvimento da plataforma.</p>
+
+    <h2>Etapa a etapa</h2>
+
+    <div class="step-block">
+      <h3><span class="step-num">1</span>Confira a lista de respawns</h3>
+      <p>Tudo comeca por ali. Ao abrir a lista, você ve todos os locais de caça disponiveis no Belobra, organizados de forma simples. Cada card mostra:</p>
+      <ul class="feature-list">
+        <li>Nome e descricao do respawn</li>
+        <li>Status: Livre, Ocupado, Em fila ou Fechado</li>
+        <li>Quem está caçando ali (se tiver alguém) e quanto tempo falta</li>
+        <li>Quantas pessoas já estão esperando na fila</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h3><span class="step-num">2</span>Escolha o personagem e o tempo</h3>
+      <p>Ao clicar em "Entrar na Fila", uma janela abre pra você definir dois detalhes:</p>
+      <ul class="feature-list">
+        <li>Qual personagem vai usar — Main ou Maker, se tiver um cadastrado</li>
+        <li>Quanto tempo pretende caçar — 1, 2 ou 3 horas, com +15 minutos de bonus pra refill somados automaticamente</li>
+      </ul>
+      <div class="tip-box"><b>Dica:</b> se a ideia e uma hunt rapida, vale escolher 1 hora — isso ajuda a fila a andar mais rapido pra todo mundo.</div>
+    </div>
+
+    <div class="step-block">
+      <h3><span class="step-num">3</span>Espere sua vez</h3>
+      <p>Depois de confirmar, você entra na fila e passa a ver em tempo real:</p>
+      <ul class="feature-list">
+        <li>Sua posição atual na fila</li>
+        <li>Uma previsao de quando sua hunt deve começar</li>
+        <li>Quanto tempo ainda falta pro jogador que está lá agora</li>
+      </ul>
+      <p>Enquanto espera, da pra fazer outra coisa — fabricar runa, avancar quest, o que preferir. O sistema te avisa quando chegar sua vez.</p>
+    </div>
+
+    <div class="step-block">
+      <h3><span class="step-num">4</span>Confirme a vaga a tempo</h3>
+      <p>Quando sua vez chegar, você recebe um aviso sonoro e uma janela de confirmação aparece na tela. A partir dai, são 5 minutos pra confirmar que vai começar a hunt. Passou do tempo? A vaga vai automaticamente pro próximo da fila.</p>
+      <div class="warn-box"><b>Atenção:</b> perder o prazo de confirmação te coloca num cooldown de 5 minutos antes de poder entrar em outra fila. Vale ficar de olho nos avisos.</div>
+      <div class="info-box"><b>Importante:</b> deixe as notificações do navegador liberadas e o som ligado — assim você recebe o aviso mesmo estando em outra aba ou fazendo outra coisa no computador.</div>
+    </div>
+
+    <div class="step-block">
+      <h3><span class="step-num">5</span>Caçe</h3>
+      <p>Confirmada a vaga, o contador da sua hunt comeca a rodar — o tempo escolhido (1, 2 ou 3 horas) mais os 15 minutos extras de refill. Enquanto isso:</p>
+      <ul class="feature-list">
+        <li>Outros jogadores conseguem ver que você está ativo no respawn</li>
+        <li>Você pode receber um Report AFK caso fique ausente</li>
+        <li>Da pra encerrar a hunt antes do tempo acabar, se quiser</li>
+      </ul>
+    </div>
+
+    <div class="step-block">
+      <h3><span class="step-num">6</span>Encerre a hunt</h3>
+      <p>Quando o tempo acaba, a hunt termina sozinha e o respawn libera pro próximo da fila. Se preferir sair antes, e só clicar em "Encerrar Hunt" no painel — isso e visto como boa prática e deixa o respawn disponivel mais cedo pra quem está esperando.</p>
+    </div>
+
+    <h2>Regras que valem lembrar</h2>
+    <ul class="feature-list">
+      <li>Você só pode estar em uma fila de cada vez</li>
+      <li>Sair de uma fila gera um cooldown de 5 minutos antes da próxima</li>
+      <li>Não vale usar varios personagens pra monopolizar uma fila</li>
+      <li>O sistema já tem proteção embutida contra fraude e monopólio</li>
+    </ul>
+    <p>Pra entender essas regras com mais detalhe, da uma olhada na <a href="belobra-regras.html" style="color:var(--accent-gold)">pagina de Regras</a>.</p>
+
+    <div class="cta">
+      <p>Agora que você sabe como o fluxo completo funciona, e só escolher um respawn e entrar na fila.</p>
+      <a href="belobra-respawn-list.html">Ver lista de respawns</a>
+    </div>
+  </article>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --border-livre:#2fbf87;
+    --border-ocupado:#e2574c;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg-page);
+    color:var(--text-primary);
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    min-height:100vh;
+  }
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 32px;
+    flex-wrap:wrap;
+    gap:12px;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;letter-spacing:0.5px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{
+    color:var(--text-secondary);
+    text-decoration:none;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  nav a:hover{color:var(--text-primary);}
+  nav a.current{color:var(--accent-gold);}
+  .support{
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:none;
+  }
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:1200px;margin:0 auto;padding:32px 24px 80px;}
+  .page-title{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .page-title h1{font-size:28px;letter-spacing:1px;}
+  .page-title .icon{color:var(--accent-gold);font-size:26px;}
+  .counts{display:flex;gap:20px;font-size:13px;color:var(--text-secondary);margin-bottom:24px;}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+  .dot.livre{background:var(--accent-teal);}
+  .dot.ocupado{background:var(--accent-red);}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap;}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;}
+  .controls button, .controls input, .controls select{
+    background:var(--pill-bg);
+    border:1px solid var(--border);
+    color:var(--text-primary);
+    border-radius:8px;
+    padding:10px 16px;
+    font-size:13px;
+  }
+  .controls input{width:220px;}
+  .controls button{cursor:pointer;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .controls button:hover{border-color:var(--text-secondary);}
+  .controls button.active{border-color:var(--accent-gold);color:var(--accent-gold);}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-left:4px solid var(--border-livre);
+    border-radius:10px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    min-height:230px;
+  }
+  .card.ocupado{border-left-color:var(--border-ocupado);}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:8px;}
+  .card-head h3{font-size:17px;line-height:1.3;font-weight:700;}
+  .status{font-size:11px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;display:flex;align-items:center;gap:6px;margin-top:4px;}
+  .status.ocupado{color:var(--accent-red);}
+  .status.livre{color:var(--accent-teal);}
+
+  .maker-row{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text-primary);}
+  .maker-row .swords{color:var(--text-secondary);}
+
+  .timer{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(226,87,76,0.12);
+    color:var(--accent-red);
+    border:1px solid rgba(226,87,76,0.3);
+    border-radius:8px;
+    padding:6px 12px;
+    font-size:14px;
+    font-weight:700;
+    font-family:'Consolas',monospace;
+    margin-bottom:16px;
+    width:fit-content;
+  }
+
+  .queue-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:6px;}
+  .queue-bar{height:5px;border-radius:4px;background:var(--border);overflow:hidden;margin-bottom:auto;}
+  .queue-fill{height:100%;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));}
+
+  .card-footer{display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--pill-bg);
+    color:var(--text-secondary);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    font-size:16px;
+  }
+  .icon-btn.active{border-color:var(--accent-gold);color:var(--accent-gold);}
+  .btn-secondary{
+    flex:1;
+    background:var(--pill-bg);
+    border:1px solid var(--border);
+    color:var(--text-primary);
+    border-radius:20px;
+    padding:10px 14px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    text-decoration:none;
+  }
+  .btn-primary{
+    flex:1.4;
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;
+    border:none;
+    border-radius:20px;
+    padding:10px 14px;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:0.3px;
+    cursor:pointer;
+    text-decoration:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .btn-primary:hover, .btn-secondary:hover{opacity:0.9;}
+  .no-results{grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:14px;padding:40px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html" class="current">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <div class="left">
+      <div class="page-title"><h1>RESPAWN LIST</h1></div>
+      <div class="counts">
+        <span><span class="dot livre"></span><span id="count-livre">0</span> locais livres</span>
+        <span><span class="dot ocupado"></span><span id="count-ocupado">0</span> ocupados</span>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="fav-toggle">Favoritos</button>
+      <input id="search" placeholder="Buscar por hunt ou cidade...">
+      <select id="sort">
+        <option value="padrao">Ordenacao: Padrao</option>
+        <option value="az">Nome A-Z</option>
+        <option value="livres">Livres primeiro</option>
+        <option value="ocupados">Ocupados primeiro</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+const RESPAWNS = [
+"Roshamuul - Prison -3","Roshamuul - Roshamuul North","Roshamuul - Guzzlehole Gorge",
+"Warzone - Warzone 1","Warzone - Warzone 2","Warzone - Warzone 4",
+"Warzone - Warzone 5","Warzone - Warzone 6","Warzone - Warzone 8",
+"Zao - Draken","Venore - Ripper Spectre","Venore - Buried Cathedral -3",
+"Port Hope - Mitmah (Santuario)","Port Hope - Gazer Spectre","Issavi - Goannas (norte)",
+"Port Hope - Lost Soul","Darashia - Infinity","Venore - Buried Cathedral -1",
+"Venore - Buried Cathedral -2","Issavi - Girtabilu","Issavi - Bueiros",
+"Issavi - Goannas (sul)","Port Hope - Mitmah (entrada)","Carlin - Ice Library",
+"Warzone - Warzone 7 (andar -2)","Thais - MOTA -1","Zao - Dragaozinho +1",
+"Warzone - Warzone 3","Zao - Dragaozinho Terreo","Ab'Dendriel - Inner Crypt",
+"Roshamuul - Roshamuul Upper","Zao - Falcon Aguia","Carlin - Ice Library Alternativa",
+"Carlin - Fire Library","Darashia - Ferumbras DT Seal -1","Darashia - Ferumbras Infernatil",
+"Darashia - Ferumbras Jugger Seal -1","Darashia - Ferumbras Jugger Seal -2","Darashia - Ferumbras Plague -1",
+"Darashia - Ferumbras Pumin Seal -3","Darashia - Ferumbras Undead Seal -1","Darashia - Ferumbras Undead Seal -2",
+"Edron - DT Inquisition","Edron - Ingol -1","Edron - Ingol -2",
+"Edron - Ingol -3","Edron - Ingol -4","Edron - Ingol Surface Esquerda",
+"Darashia - Cobra -1","Darashia - Cobra Bastion","Darashia - Deep Desert -2",
+"Darashia - Ferumbras Bazir Seal","Darashia - Nightmare Isles","Edron - Azillon -1",
+"Edron - Azillon -2","Edron - Azillon -3","Edron - Azillon -4",
+"Edron - Azillon Castle","Edron - Carnisys/Anni","Edron - Lost Soul",
+"Zao - Falcon Castle","Zao - Draken Walls (Sul)","Venore - Lost Soul -1",
+"Venore - Lost Soul -2","Venore - Lost Soul -3","Oramond - Undead Dragon",
+"Issavi - Puzzle","Plains of Havoc - Bulltar -1","Plains of Havoc - Bulltar -2",
+"Port Hope - Asura (Palace)","Feyrist - Weakened Frazzlemaw -1","Feyrist - Weakened Frazzlemaw -2",
+"Feyrist - Elfo de Fogo (Castelo)","Svargrond - Elfo de Gelo","Oramond - Glooth Factory",
+"Gray Island - Deathling","Vengoth - Norcferatu Fortress","Vengoth - Norcferatu Dungeon (West)",
+"Vengoth - Norcferatu Dungeon (East)","Warzone - Warzone 7 (andar -1)","Edron - Podzila Rootthings -2",
+"Marapur - Nagas","Oramond - Catacombs Esquerda","Oramond - Catacombs Direita",
+"Thais - MOTA -2","Thais - MOTA -3","Roshamuul - Lower Roshamuul",
+"Oskayaat - Weretiger -1","Oskayaat - Weretiger -2","Oskayaat - Werecrocodile -1",
+"Oskayaat - Werecrocodile -2","Carlin - Energy Library Terreo","Darashia - Caminho Ferumbras -1 (escada)",
+"Issavi - Ogre (cachoeira)","Roshamuul - Prison -1","Roshamuul - Prison -2",
+"Issavi - Sphinx -2","Oramond - Furys","Roshamuul - Shock Head (after bones)",
+"Marapur - Tartaruguinhas","Port Hope - Carnivoras","Venore - POI Ashfalor Seal",
+"Edron - Book World -3","Edron - Book World -1","Edron - Bounac Crypt Warriors",
+"Oramond - Glooth Tower","Roshamuul - Tubaroes","Venore - POI Bazir Seal",
+"Venore - POI Pumin Seal","Venore - POI Tafariel Seal","Venore - POI Infernatil Seal",
+"Venore - POI Verminor Seal","Darashia - Caminho Last Ferumbras","Edron - Raubritter Castelo",
+"Darashia - Werelions -2","Edron - Raubritter Subsolo","Carlin - Energy Library -1",
+"Darashia - Caminho Last Ferumbras n8","Darashia - Ferumbras DT Seal -2","Darashia - Ferumbras Infernatil +1",
+"Darashia - Ferumbras Plague -2","Darashia - Ferumbras Pumin Seal -1 e -2","Edron - Ingol -5",
+"Edron - Ingol Surface Direita","Candia - Chocolate Mines -1 e -2","Darashia - Burster Spectre",
+"Darashia - Deep Desert -3","Darashia - Grim Reaper","Darashia - Werelions -1",
+"Edron - Book World -2","Edron - Orc Cult","Edron - Bounac Usurpers",
+"Edron - Podzila Quaras","Zao - Draken Walls (Norte)","Yalahar - Grim Reaper",
+"Edron - Podzila Rootthings -1","Warzone - Warzone 9","Svargrond - Elf de Gelo (teleport)",
+"Feyrist - Elf de Fogo (Teleport)","Darashia - Caminho Ferumbras (volta completa)"
+];
+
+const state = RESPAWNS.map((name, i) => ({
+  id: i,
+  name: name,
+  favorite: false
+}));
+
+let showFavOnly = false;
+let searchTerm = "";
+let sortMode = "padrao";
+
+// ===== Motor de fila (localStorage) — compartilhado com a página de detalhe =====
+const QUEUE_PREFIX = "belobra_queue_";
+
+function loadQueue(id){
+  try{
+    const raw = localStorage.getItem(QUEUE_PREFIX + id);
+    return raw ? JSON.parse(raw) : { active: null, waiting: [], calling: null };
+  }catch(e){
+    return { active: null, waiting: [], calling: null };
+  }
+}
+function saveQueue(id, q){
+  localStorage.setItem(QUEUE_PREFIX + id, JSON.stringify(q));
+}
+function tickQueue(id){
+  const q = loadQueue(id);
+  const now = Date.now();
+  let changed = false;
+
+  if(q.active){
+    const totalMs = (q.active.durationMin + 15) * 60000;
+    if(now - q.active.startedAt >= totalMs){
+      q.active = null;
+      changed = true;
+    }
+  }
+  if(q.calling && now > q.calling.deadline){
+    q.calling = null;
+    changed = true;
+  }
+  if(!q.active && !q.calling && q.waiting.length > 0){
+    const next = q.waiting.shift();
+    q.calling = { name: next.name, type: next.type, durationMin: next.durationMin, deadline: now + 5*60000 };
+    changed = true;
+  }
+  if(changed) saveQueue(id, q);
+  return q;
+}
+function queueCount(q){ return q.waiting.length + (q.calling ? 1 : 0); }
+function isOcupado(q){ return !!q.active || !!q.calling; }
+// ===============================================================================
+
+function render(){
+  const grid = document.getElementById("grid");
+  let items = state.filter(r => {
+    if(showFavOnly && !r.favorite) return false;
+    if(searchTerm && !r.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  }).map(r => {
+    const q = tickQueue(r.id);
+    return { ...r, ocupado: isOcupado(q), queue: queueCount(q) };
+  });
+
+  if(sortMode === "az"){
+    items = items.slice().sort((a,b) => a.name.localeCompare(b.name));
+  } else if(sortMode === "livres"){
+    items = items.slice().sort((a,b) => (a.ocupado?1:0) - (b.ocupado?1:0));
+  } else if(sortMode === "ocupados"){
+    items = items.slice().sort((a,b) => (a.ocupado?0:1) - (b.ocupado?0:1));
+  }
+
+  if(items.length === 0){
+    grid.innerHTML = '<div class="no-results">Nenhum respawn encontrado.</div>';
+  } else {
+    grid.innerHTML = items.map(r => {
+      const isOcupadoR = r.ocupado;
+      const pct = Math.min(100, (r.queue/10)*100);
+      return `
+        <div class="card ${isOcupadoR ? 'ocupado' : ''}">
+          <div class="card-head">
+            <h3>${r.name}</h3>
+            <span class="status ${isOcupadoR?'ocupado':'livre'}">&#9679; ${isOcupadoR?'OCUPADO':'LIVRE'}</span>
+          </div>
+          <div class="queue-label"><span>${r.queue} na fila</span><span>máximo 10</span></div>
+          <div class="queue-bar"><div class="queue-fill" style="width:${pct}%"></div></div>
+          <div class="card-footer">
+            <div class="icon-btn ${r.favorite?'active':''}" onclick="toggleFav(${r.id})">&#9733;</div>
+            <a class="btn-secondary" href="belobra-respawn-detail.html?id=${r.id}">Ver fila</a>
+            <a class="btn-primary" href="belobra-respawn-detail.html?id=${r.id}&join=1">${isOcupadoR ? 'Reservar vaga' : 'Entrar na fila'}</a>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  const livres = items.length ? state.filter(r => !isOcupado(tickQueue(r.id))).length : state.length;
+  const ocupados = state.length - livres;
+  document.getElementById("count-livre").textContent = livres;
+  document.getElementById("count-ocupado").textContent = ocupados;
+}
+
+setInterval(render, 5000);
+
+function toggleFav(id){
+  const r = state.find(x => x.id === id);
+  r.favorite = !r.favorite;
+  render();
+}
+
+document.getElementById("fav-toggle").addEventListener("click", () => {
+  showFavOnly = !showFavOnly;
+  document.getElementById("fav-toggle").classList.toggle("active", showFavOnly);
+  render();
+});
+
+document.getElementById("search").addEventListener("input", (e) => {
+  searchTerm = e.target.value;
+  render();
+});
+
+document.getElementById("sort").addEventListener("change", (e) => {
+  sortMode = e.target.value;
+  render();
+});
+
+render();
+</script>
+
+</body>
+</html>

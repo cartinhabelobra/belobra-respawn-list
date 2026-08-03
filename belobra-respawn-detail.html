@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Fila do Respawn</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --accent-blue:#5b9bd5;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover{color:var(--text-primary);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:1100px;margin:0 auto;padding:28px 24px 90px;}
+
+  .back-btn{
+    display:block;width:100%;text-align:center;
+    background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+    padding:14px;color:var(--text-secondary);text-decoration:none;
+    font-size:13px;font-weight:600;letter-spacing:0.5px;margin-bottom:24px;
+  }
+  .back-btn:hover{border-color:var(--accent-teal);color:var(--text-primary);}
+
+  .rp-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
+  .rp-head h1{font-size:26px;color:var(--accent-teal);margin-bottom:4px;}
+  .rp-head .desc{color:var(--text-muted);font-size:13px;}
+  .rp-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:700;letter-spacing:0.5px;
+    padding:8px 14px;border-radius:20px;
+  }
+  .status-pill.livre{background:rgba(47,191,135,0.15);color:var(--accent-teal);}
+  .status-pill.ocupado{background:rgba(226,87,76,0.15);color:var(--accent-red);}
+  .btn-join{
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;border:none;
+    padding:12px 22px;border-radius:20px;
+    font-weight:800;font-size:13px;cursor:pointer;
+  }
+  .btn-join:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .queue-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .queue-panel-head{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border);font-weight:700;font-size:15px;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{text-align:left;font-size:11px;color:var(--text-secondary);letter-spacing:0.5px;padding:14px 22px;border-bottom:1px solid var(--border);}
+  tbody td{padding:16px 22px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  .pos-badge{width:30px;height:30px;border-radius:50%;background:var(--pill-bg);color:var(--accent-teal);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .player-name{font-weight:700;}
+  .player-tag{display:block;font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:0.3px;padding:5px 10px;border-radius:20px;}
+  .chip.cacando{background:rgba(226,87,76,0.15);color:var(--accent-red);}
+  .chip.fila{background:rgba(91,155,213,0.15);color:var(--accent-blue);}
+  .chip.aguardando{background:rgba(224,169,74,0.18);color:var(--accent-gold);}
+  .timer-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;background:var(--pill-bg);color:var(--text-primary);padding:5px 10px;border-radius:10px;margin-left:6px;font-family:'Consolas',monospace;}
+  .countdown{color:var(--accent-gold);}
+  .previsto{color:var(--accent-blue);font-weight:700;}
+  .muted{color:var(--text-muted);}
+  .row-actions{display:flex;gap:8px;}
+  .btn-mini{font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--pill-bg);color:var(--text-primary);cursor:pointer;}
+  .btn-mini.end{color:var(--accent-red);border-color:rgba(226,87,76,0.4);}
+  .btn-mini.accept{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;border:none;}
+  .btn-mini.cancel{color:var(--text-muted);}
+
+  .empty-queue{padding:40px;text-align:center;color:var(--text-muted);font-size:14px;}
+
+  .siren-banner{display:none;align-items:center;gap:12px;background:rgba(224,169,74,0.1);border:1px solid rgba(224,169,74,0.4);border-radius:12px;padding:14px 20px;margin-bottom:18px;font-size:14px;}
+  .siren-banner.show{display:flex;}
+  .siren-banner .ico{font-size:20px;animation:ring 1s infinite;}
+  @keyframes ring{0%,100%{transform:rotate(0);}20%{transform:rotate(-15deg);}40%{transform:rotate(15deg);}60%{transform:rotate(-10deg);}80%{transform:rotate(10deg);}}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:380px;}
+  .modal-box h3{font-size:16px;margin-bottom:16px;}
+  .modal-box label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;margin-top:14px;}
+  .modal-box input, .modal-box select{width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;}
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .modal-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
+  .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;}
+  .modal-actions .cancel{background:var(--pill-bg);color:var(--text-primary);border:1px solid var(--border);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatisticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <a href="belobra-respawn-list.html" class="back-btn">&#8592; VOLTAR AO DASHBOARD</a>
+
+  <div class="siren-banner" id="siren-banner">
+    <span class="ico">&#128276;</span>
+    <span id="siren-text"></span>
+  </div>
+
+  <div class="rp-head">
+    <div>
+      <h1 id="rp-title">Respawn</h1>
+      <div class="desc">Sem descricao</div>
+    </div>
+    <div class="rp-actions">
+      <span class="status-pill" id="status-pill">&#9679; LIVRE</span>
+      <button class="btn-join" id="join-btn" onclick="openJoinModal()">Entrar na Fila</button>
+    </div>
+  </div>
+
+  <div class="queue-panel">
+    <div class="queue-panel-head">&#128202; Fila Atual (<span id="queue-count">0</span>/10)</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Jogador</th>
+          <th>Status / Tempo</th>
+          <th>Entrada na fila</th>
+          <th>Inicio da hunt</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="queue-body"></tbody>
+    </table>
+    <div class="empty-queue" id="empty-msg" style="display:none;">Ninguem na fila ainda. Seja o primeiro a entrar!</div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="join-modal">
+  <div class="modal-box">
+    <h3>Entrar na fila</h3>
+    <label>Nome do personagem</label>
+    <input type="text" id="input-name" placeholder="Ex: Monks Lord">
+    <label>Tipo</label>
+    <select id="input-type">
+      <option value="main">Personagem Principal</option>
+      <option value="maker">Maker</option>
+    </select>
+    <label>Tempo de hunt</label>
+    <select id="input-duration">
+      <option value="60">1 hora (+15min refill)</option>
+      <option value="120">2 horas (+15min refill)</option>
+      <option value="180">3 horas (+15min refill)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeJoinModal()">Cancelar</button>
+      <button class="confirm" onclick="confirmJoin()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const RESPAWNS = [
+"Roshamuul - Prison -3","Roshamuul - Roshamuul North","Roshamuul - Guzzlehole Gorge",
+"Warzone - Warzone 1","Warzone - Warzone 2","Warzone - Warzone 4",
+"Warzone - Warzone 5","Warzone - Warzone 6","Warzone - Warzone 8",
+"Zao - Draken","Venore - Ripper Spectre","Venore - Buried Cathedral -3",
+"Port Hope - Mitmah (Santuario)","Port Hope - Gazer Spectre","Issavi - Goannas (norte)",
+"Port Hope - Lost Soul","Darashia - Infinity","Venore - Buried Cathedral -1",
+"Venore - Buried Cathedral -2","Issavi - Girtabilu","Issavi - Bueiros",
+"Issavi - Goannas (sul)","Port Hope - Mitmah (entrada)","Carlin - Ice Library",
+"Warzone - Warzone 7 (andar -2)","Thais - MOTA -1","Zao - Dragaozinho +1",
+"Warzone - Warzone 3","Zao - Dragaozinho Terreo","Ab'Dendriel - Inner Crypt",
+"Roshamuul - Roshamuul Upper","Zao - Falcon Aguia","Carlin - Ice Library Alternativa",
+"Carlin - Fire Library","Darashia - Ferumbras DT Seal -1","Darashia - Ferumbras Infernatil",
+"Darashia - Ferumbras Jugger Seal -1","Darashia - Ferumbras Jugger Seal -2","Darashia - Ferumbras Plague -1",
+"Darashia - Ferumbras Pumin Seal -3","Darashia - Ferumbras Undead Seal -1","Darashia - Ferumbras Undead Seal -2",
+"Edron - DT Inquisition","Edron - Ingol -1","Edron - Ingol -2",
+"Edron - Ingol -3","Edron - Ingol -4","Edron - Ingol Surface Esquerda",
+"Darashia - Cobra -1","Darashia - Cobra Bastion","Darashia - Deep Desert -2",
+"Darashia - Ferumbras Bazir Seal","Darashia - Nightmare Isles","Edron - Azillon -1",
+"Edron - Azillon -2","Edron - Azillon -3","Edron - Azillon -4",
+"Edron - Azillon Castle","Edron - Carnisys/Anni","Edron - Lost Soul",
+"Zao - Falcon Castle","Zao - Draken Walls (Sul)","Venore - Lost Soul -1",
+"Venore - Lost Soul -2","Venore - Lost Soul -3","Oramond - Undead Dragon",
+"Issavi - Puzzle","Plains of Havoc - Bulltar -1","Plains of Havoc - Bulltar -2",
+"Port Hope - Asura (Palace)","Feyrist - Weakened Frazzlemaw -1","Feyrist - Weakened Frazzlemaw -2",
+"Feyrist - Elfo de Fogo (Castelo)","Svargrond - Elfo de Gelo","Oramond - Glooth Factory",
+"Gray Island - Deathling","Vengoth - Norcferatu Fortress","Vengoth - Norcferatu Dungeon (West)",
+"Vengoth - Norcferatu Dungeon (East)","Warzone - Warzone 7 (andar -1)","Edron - Podzila Rootthings -2",
+"Marapur - Nagas","Oramond - Catacombs Esquerda","Oramond - Catacombs Direita",
+"Thais - MOTA -2","Thais - MOTA -3","Roshamuul - Lower Roshamuul",
+"Oskayaat - Weretiger -1","Oskayaat - Weretiger -2","Oskayaat - Werecrocodile -1",
+"Oskayaat - Werecrocodile -2","Carlin - Energy Library Terreo","Darashia - Caminho Ferumbras -1 (escada)",
+"Issavi - Ogre (cachoeira)","Roshamuul - Prison -1","Roshamuul - Prison -2",
+"Issavi - Sphinx -2","Oramond - Furys","Roshamuul - Shock Head (after bones)",
+"Marapur - Tartaruguinhas","Port Hope - Carnivoras","Venore - POI Ashfalor Seal",
+"Edron - Book World -3","Edron - Book World -1","Edron - Bounac Crypt Warriors",
+"Oramond - Glooth Tower","Roshamuul - Tubaroes","Venore - POI Bazir Seal",
+"Venore - POI Pumin Seal","Venore - POI Tafariel Seal","Venore - POI Infernatil Seal",
+"Venore - POI Verminor Seal","Darashia - Caminho Last Ferumbras","Edron - Raubritter Castelo",
+"Darashia - Werelions -2","Edron - Raubritter Subsolo","Carlin - Energy Library -1",
+"Darashia - Caminho Last Ferumbras n8","Darashia - Ferumbras DT Seal -2","Darashia - Ferumbras Infernatil +1",
+"Darashia - Ferumbras Plague -2","Darashia - Ferumbras Pumin Seal -1 e -2","Edron - Ingol -5",
+"Edron - Ingol Surface Direita","Candia - Chocolate Mines -1 e -2","Darashia - Burster Spectre",
+"Darashia - Deep Desert -3","Darashia - Grim Reaper","Darashia - Werelions -1",
+"Edron - Book World -2","Edron - Orc Cult","Edron - Bounac Usurpers",
+"Edron - Podzila Quaras","Zao - Draken Walls (Norte)","Yalahar - Grim Reaper",
+"Edron - Podzila Rootthings -1","Warzone - Warzone 9","Svargrond - Elf de Gelo (teleport)",
+"Feyrist - Elf de Fogo (Teleport)","Darashia - Caminho Ferumbras (volta completa)"
+];
+
+const params = new URLSearchParams(location.search);
+const id = parseInt(params.get('id'), 10);
+const shouldOpenJoin = params.get('join') === '1';
+const respawnName = RESPAWNS[id] || 'Respawn nao encontrado';
+document.getElementById('rp-title').textContent = respawnName;
+document.title = 'Belobra Respawn List - ' + respawnName;
+
+// ===== Mesmo motor de fila usado na lista principal (localStorage) =====
+const QUEUE_PREFIX = "belobra_queue_";
+
+function loadQueue(qid){
+  try{
+    const raw = localStorage.getItem(QUEUE_PREFIX + qid);
+    return raw ? JSON.parse(raw) : { active: null, waiting: [], calling: null };
+  }catch(e){
+    return { active: null, waiting: [], calling: null };
+  }
+}
+function saveQueue(qid, q){
+  localStorage.setItem(QUEUE_PREFIX + qid, JSON.stringify(q));
+}
+function tickQueue(qid){
+  const q = loadQueue(qid);
+  const now = Date.now();
+  let changed = false;
+
+  if(q.active){
+    const totalMs = (q.active.durationMin + 15) * 60000;
+    if(now - q.active.startedAt >= totalMs){
+      q.active = null;
+      changed = true;
+    }
+  }
+  if(q.calling && now > q.calling.deadline){
+    q.calling = null;
+    changed = true;
+  }
+  if(!q.active && !q.calling && q.waiting.length > 0){
+    const next = q.waiting.shift();
+    q.calling = { name: next.name, type: next.type, durationMin: next.durationMin, deadline: now + 5*60000, joinedAt: next.joinedAt };
+    changed = true;
+  }
+  if(changed) saveQueue(qid, q);
+  return q;
+}
+function queueCount(q){ return q.waiting.length + (q.calling ? 1 : 0); }
+function isOcupado(q){ return !!q.active || !!q.calling; }
+// ===============================================================================
+
+function playSiren(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    const now = ctx.currentTime;
+    for(let i=0;i<4;i++){
+      osc.frequency.setValueAtTime(600, now + i*0.4);
+      osc.frequency.linearRampToValueAtTime(900, now + i*0.4 + 0.2);
+      osc.frequency.linearRampToValueAtTime(600, now + i*0.4 + 0.4);
+    }
+    osc.start(now);
+    osc.stop(now + 1.6);
+  }catch(e){ /* audio indisponivel neste navegador */ }
+}
+
+function fmtTime(ts){ return new Date(ts).toTimeString().slice(0,5); }
+function fmtCountdown(ms){
+  if(ms < 0) ms = 0;
+  const totalSec = Math.floor(ms/1000);
+  return Math.floor(totalSec/60) + 'm ' + String(totalSec%60).padStart(2,'0') + 's';
+}
+function fmtHuntRemaining(ms){
+  if(ms < 0) ms = 0;
+  const totalMin = Math.floor(ms/60000);
+  return Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm';
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+let sirenPlayedFor = null;
+
+function render(){
+  const q = tickQueue(id);
+  const now = Date.now();
+
+  const pill = document.getElementById('status-pill');
+  const joinBtn = document.getElementById('join-btn');
+  const ocupado = isOcupado(q);
+  pill.className = 'status-pill ' + (ocupado ? 'ocupado' : 'livre');
+  pill.innerHTML = ocupado ? '&#9679; OCUPADO' : '&#9679; LIVRE';
+  joinBtn.disabled = queueCount(q) >= 10;
+
+  const banner = document.getElementById('siren-banner');
+  if(q.calling){
+    const callKey = q.calling.name + q.calling.deadline;
+    if(sirenPlayedFor !== callKey){
+      playSiren();
+      sirenPlayedFor = callKey;
+    }
+    banner.classList.add('show');
+    document.getElementById('siren-text').innerHTML = 'É a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando confirmacao...';
+  } else {
+    banner.classList.remove('show');
+  }
+
+  document.getElementById('queue-count').textContent = (q.active?1:0) + queueCount(q);
+
+  const rows = [];
+  if(q.active) rows.push({ kind:'active', ...q.active });
+  if(q.calling) rows.push({ kind:'calling', ...q.calling });
+  q.waiting.forEach(w => rows.push({ kind:'waiting', ...w }));
+
+  const tbody = document.getElementById('queue-body');
+  const emptyMsg = document.getElementById('empty-msg');
+
+  if(rows.length === 0){
+    tbody.innerHTML = '';
+    emptyMsg.style.display = 'block';
+  } else {
+    emptyMsg.style.display = 'none';
+    tbody.innerHTML = rows.map((r, i) => {
+      let statusCell, timeCell, actionsCell, previstoCell;
+      const tag = r.type === 'maker' ? 'MAKER' : 'PRINCIPAL';
+      const joinedCell = r.joinedAt ? fmtTime(r.joinedAt) : '&mdash;';
+
+      if(r.kind === 'active'){
+        statusCell = '<span class="chip cacando">&#9876;&#65039; CACANDO</span>';
+        const remain = (r.durationMin + 15) * 60000 - (now - r.startedAt);
+        timeCell = '<span class="timer-chip">&#9201; ' + fmtHuntRemaining(remain) + '</span>';
+        actionsCell = '<button class="btn-mini end" onclick="endHunt()">Encerrar Hunt</button>';
+        previstoCell = '<span class="previsto">Em andamento</span>';
+      } else if(r.kind === 'calling'){
+        statusCell = '<span class="chip aguardando">&#128276; AGUARDANDO</span>';
+        const remain = r.deadline - now;
+        timeCell = '<span class="timer-chip countdown">&#9201; ' + fmtCountdown(remain) + '</span>';
+        actionsCell = '<div class="row-actions">' +
+          '<button class="btn-mini accept" onclick="acceptVaga()">Aceitar Vaga</button>' +
+          '<button class="btn-mini cancel" onclick="giveUpCalling()">Desistir</button></div>';
+        previstoCell = '<span class="previsto">Confirmar agora</span>';
+      } else {
+        statusCell = '<span class="chip fila">&#9203; NA FILA</span>';
+        timeCell = '<span class="muted">&mdash;</span>';
+        const waitIdx = i - ((q.active?1:0) + (q.calling?1:0));
+        actionsCell = '<button class="btn-mini cancel" onclick="leaveWaiting(' + waitIdx + ')">Sair da fila</button>';
+        previstoCell = '<span class="previsto">Na fila</span>';
+      }
+
+      return '<tr>' +
+        '<td><div class="pos-badge">' + (i+1) + '</div></td>' +
+        '<td><span class="player-name">' + escapeHtml(r.name) + '</span><span class="player-tag">' + tag + '</span></td>' +
+        '<td>' + statusCell + ' ' + timeCell + '</td>' +
+        '<td class="muted">' + joinedCell + '</td>' +
+        '<td>' + previstoCell + '</td>' +
+        '<td>' + actionsCell + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+}
+
+function openJoinModal(){
+  document.getElementById('join-modal').classList.add('show');
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-name').focus();
+}
+function closeJoinModal(){
+  document.getElementById('join-modal').classList.remove('show');
+}
+function confirmJoin(){
+  const name = document.getElementById('input-name').value.trim();
+  if(!name){ alert('Digite o nome do personagem.'); return; }
+  const type = document.getElementById('input-type').value;
+  const durationMin = parseInt(document.getElementById('input-duration').value, 10);
+
+  const q = loadQueue(id);
+  q.waiting.push({ name, type, durationMin, joinedAt: Date.now() });
+  saveQueue(id, q);
+  closeJoinModal();
+  render();
+}
+function endHunt(){
+  const q = loadQueue(id);
+  q.active = null;
+  saveQueue(id, q);
+  render();
+}
+function acceptVaga(){
+  const q = loadQueue(id);
+  if(q.calling){
+    q.active = { name: q.calling.name, type: q.calling.type, durationMin: q.calling.durationMin, startedAt: Date.now() };
+    q.calling = null;
+    saveQueue(id, q);
+    render();
+  }
+}
+function giveUpCalling(){
+  const q = loadQueue(id);
+  q.calling = null;
+  saveQueue(id, q);
+  render();
+}
+function leaveWaiting(idx){
+  const q = loadQueue(id);
+  q.waiting.splice(idx, 1);
+  saveQueue(id, q);
+  render();
+}
+
+setInterval(render, 1000);
+render();
+if(shouldOpenJoin) openJoinModal();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Por que Usar um Sistema Organizado</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  article h2{font-size:18px;color:var(--accent-teal);margin:32px 0 12px;}
+  article h3{font-size:15px;color:var(--accent-gold);margin:20px 0 8px;}
+  article p{font-size:15px;line-height:1.75;color:var(--text-primary);margin-bottom:14px;}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;}
+  @média (max-width:600px){.compare{grid-template-columns:1fr;}}
+  .compare-col{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+  .compare-col.before h3{color:var(--accent-red);}
+  .compare-col.after h3{color:var(--accent-teal);}
+  .compare-col ul{list-style:none;}
+  .compare-col li{font-size:13px;color:var(--text-secondary);padding:7px 0 7px 20px;position:relative;}
+  .compare-col.before li::before{content:"\2717";position:absolute;left:0;color:var(--accent-red);}
+  .compare-col.after li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);}
+
+  ul.feature-list{list-style:none;margin:16px 0;}
+  ul.feature-list li{
+    font-size:14px;color:var(--text-primary);
+    padding:10px 0 10px 26px;position:relative;
+    border-bottom:1px solid var(--border);
+  }
+  ul.feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);font-weight:700;}
+  ul.feature-list li:last-child{border-bottom:none;}
+  ul.feature-list li b{color:var(--text-primary);}
+
+  .stat-row{display:flex;gap:14px;margin:20px 0;flex-wrap:wrap;}
+  .stat-box{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;flex:1;min-width:150px;}
+  .stat-box .num{font-size:20px;font-weight:700;color:var(--accent-gold);}
+  .stat-box .lbl{font-size:12px;color:var(--text-secondary);}
+
+  blockquote{
+    border-left:3px solid var(--accent-teal);
+    padding:6px 20px;
+    margin:24px 0;
+    color:var(--text-secondary);
+    font-style:italic;
+    font-size:15px;
+  }
+
+  .cta{
+    margin-top:32px;
+    padding:22px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    text-align:center;
+  }
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{
+    display:inline-block;
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;
+    padding:10px 24px;
+    border-radius:20px;
+    font-weight:700;
+    font-size:13px;
+    text-decoration:none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Por que usar um sistema organizado de filas</h1>
+    <p class="lead">Os bastidores do problema: como servidores movimentados viram bagunca sem um controle de fila, e o que muda na prática quando existe uma ferramenta cuidando disso.</p>
+    <div class="meta-line"><span>Publicado em 10/04/2026</span><span>Atualizado em 24/04/2026</span></div>
+
+    <h2>O desafio de todo servidor popular</h2>
+    <p>Todo servidor com centenas de jogadores online ao mesmo tempo esbarra no mesmo problema: os melhores respawns são poucos e a fila por eles e enorme. Sem nenhum tipo de organização, isso vira terreno fertil pra conflito, frustracao e uma experiência de jogo bem pior pra todo mundo.</p>
+    <p>O Belobra, com mais de mil jogadores conectados ao mesmo tempo em horários de pico, e um exemplo clássico disso. Foi exatamente esse cenário que motivou a criacao da Cartinha Online.</p>
+
+    <h2>O antes e o depois</h2>
+    <div class="compare">
+      <div class="compare-col before">
+        <h3>Sem sistema</h3>
+        <ul>
+          <li>Ir até o respawn sem saber se estava livre, perdendo tempo a toa</li>
+          <li>Brigas constantes sobre "quem chegou primeiro"</li>
+          <li>Grupos travando respawns por horas sem nenhum limite</li>
+          <li>Nenhum historico de quem usou o que</li>
+          <li>Combinados desorganizados no chat do jogo</li>
+        </ul>
+      </div>
+      <div class="compare-col after">
+        <h3>Com a Cartinha Online</h3>
+        <ul>
+          <li>Status de todos os respawns visivel em tempo real</li>
+          <li>Fila automática e justa, com posição garantida</li>
+          <li>Limite de tempo que garante rotatividade</li>
+          <li>Historico completo de uso registrado</li>
+          <li>Avisos automaticos e comunicação centralizada</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>O que muda pra quem joga</h2>
+
+    <h3>Você ganha tempo</h3>
+    <p>Em vez de rodar o mapa inteiro checando respawn por respawn, basta olhar a lista por alguns segundos. Esse tempo economizado vira mais hunt de verdade, mais runa fabricada ou mais quest concluida.</p>
+
+    <h3>Todo mundo joga em pe de igualdade</h3>
+    <p>O sistema não favorece grupo grande, jogador antigo ou quem tem mais tempo livre pra ficar online esperando. A regra e simples e vale pra todos: quem chega primeiro na fila, e atendido primeiro.</p>
+
+    <h3>Menos atrito, mais jogo</h3>
+    <p>Com regras claras, tempo limitado e uma fila transparente, os conflitos entre jogadores caem bastante. A energia que antes ia pra discussao agora sobra pra evoluir o personagem.</p>
+
+    <h3>Da pra planejar sua sessão</h3>
+    <p>Sabendo com antecedencia quando vai ser sua vez, fica fácil encaixar outras coisas enquanto espera — seja outra atividade no jogo, seja só terminar de fazer o jantar antes de logar.</p>
+
+    <h2>O que isso traz pra comunidade como um todo</h2>
+    <ul class="feature-list">
+      <li><b>Clima mais leve:</b> menos briga significa uma comunidade mais unida</li>
+      <li><b>Gente fica mais tempo no servidor:</b> jogador cansado de bagunca costuma ir embora; um sistema justo mantem todo mundo motivado</li>
+      <li><b>Tudo fica registrado:</b> sem espaco pra "ele disse, ela disse" — o historico mostra o que realmente aconteceu</li>
+    </ul>
+
+    <h2>Os números falam por si</h2>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num">1.500+</div><div class="lbl">contas do Discord cadastradas</div></div>
+      <div class="stat-box"><div class="num">2.000+</div><div class="lbl">personagens no sistema</div></div>
+      <div class="stat-box"><div class="num">150+</div><div class="lbl">usuários simultaneos em média</div></div>
+    </div>
+    <p>Esses números mostram que a comunidade do Belobra abracou o sistema e já enxerga o valor que ele traz pra experiência de todo mundo.</p>
+
+    <blockquote>"Ferramenta de organização não e luxo — e uma necessidade em qualquer comunidade que leva a serio o respeito e a justiça entre os jogadores."</blockquote>
+
+    <div class="cta">
+      <p>Já da pra sentir a diferença. Que tal ver como está a fila agora?</p>
+      <a href="belobra-respawn-list.html">Ver lista de respawns</a>
+    </div>
+  </article>
+</main>
+
+</body>
+</html>

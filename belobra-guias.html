@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Guias</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --border-livre:#2fbf87;
+    --border-ocupado:#e2574c;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg-page);
+    color:var(--text-primary);
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    min-height:100vh;
+  }
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 32px;
+    flex-wrap:wrap;
+    gap:12px;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;letter-spacing:0.5px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--text-primary);}
+  nav a.current{color:var(--accent-gold);}
+  .support{
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:none !important;
+  }
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:1100px;margin:0 auto;padding:32px 24px 80px;}
+
+  .page-head{text-align:center;margin-bottom:40px;}
+  .page-head h1{font-size:26px;margin-bottom:10px;}
+  .page-head p{color:var(--text-secondary);font-size:14px;max-width:640px;margin:0 auto;line-height:1.6;}
+
+  h2.section-title{
+    font-size:16px;
+    color:var(--accent-teal);
+    letter-spacing:0.5px;
+    margin:36px 0 12px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--border);
+  }
+
+  .guide-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px;
+  }
+  .guide-card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px;
+    display:flex;
+    gap:14px;
+  }
+  .guide-card.featured{border-color:var(--accent-gold);}
+  .g-icon{
+    width:38px;height:38px;
+    border-radius:8px;
+    background:var(--pill-bg);
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+  }
+  .g-body h3{font-size:15px;margin-bottom:6px;line-height:1.35;}
+  .g-body p{font-size:13px;color:var(--text-secondary);line-height:1.55;margin-bottom:10px;}
+  .g-meta{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-muted);}
+  .g-meta a{color:var(--accent-gold);text-decoration:none;font-weight:600;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <div class="page-head">
+    <h1>Guias & Tutoriais</h1>
+    <p>Um guia rapido para entender o sistema de filas, aproveitar melhor suas hunts e tirar o máximo proveito da Cartinha Online no servidor Belobra.</p>
+  </div>
+
+  <h2 class="section-title">Introdução</h2>
+  <div class="guide-grid">
+    <div class="guide-card featured">
+      <div class="g-icon">&#128214;</div>
+      <div class="g-body">
+        <h3>Entenda a Cartinha Online em 5 minutos</h3>
+        <p>Um panorama rapido de para que serve a plataforma, os problemas que ela resolve na organização dos respawns e por que tanta gente do servidor já depende dela no dia a dia.</p>
+        <div class="g-meta"><span>5 min</span><a href="belobra-guia-cartinha-online.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#127918;</div>
+      <div class="g-body">
+        <h3>Primeiros passos no servidor Belobra</h3>
+        <p>Um roteiro direto ao ponto para quem está chegando agora: como se cadastrar, navegar pela fila e os cuidados basicos para não cair em nenhuma pegadinha logo de cara.</p>
+        <div class="g-meta"><span>8 min</span><a href="belobra-guia-iniciantes.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#128221;</div>
+      <div class="g-body">
+        <h3>Cadastrando seu personagem do zero</h3>
+        <p>Passo a passo simples para registrar sua conta, vincular o Discord e cadastrar Main e Makers corretamente na Cartinha Online.</p>
+        <div class="g-meta"><span>5 min</span><a href="belobra-guia-cadastro.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#127942;</div>
+      <div class="g-body">
+        <h3>Por que usar um sistema organizado de filas</h3>
+        <p>Os bastidores do problema: como servidores movimentados viram bagunca sem um controle de fila, e o que muda na prática quando existe uma ferramenta cuidando disso.</p>
+        <div class="g-meta"><span>5 min</span><a href="belobra-guia-vantagens.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Sistema</h2>
+  <div class="guide-grid">
+    <div class="guide-card featured">
+      <div class="g-icon">&#8987;</div>
+      <div class="g-body">
+        <h3>Como as filas de respawn funcionam de ponta a ponta</h3>
+        <p>Do momento em que você entra na fila até o encerramento da sua hunt: cada etapa do funcionamento automático do sistema explicada sem enrolacao.</p>
+        <div class="g-meta"><span>7 min</span><a href="belobra-guia-sistema-filas.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#9888;&#65039;</div>
+      <div class="g-body">
+        <h3>Usando o Report AFK sem errar</h3>
+        <p>Quando faz sentido reportar alguém, como a verificacao acontece nos bastidores, e o que acontece com quem e reportado e não responde a tempo.</p>
+        <div class="g-meta"><span>4 min</span><a href="belobra-guia-report-afk.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#9200;</div>
+      <div class="g-body">
+        <h3>Cooldown entre hunts: para que serve</h3>
+        <p>O motivo por tras do intervalo obrigatório entre uma fila e outra, e como esse mecanismo evita que uma pessoa ou grupo monopolize os respawns.</p>
+        <div class="g-meta"><span>4 min</span><a href="belobra-guia-cooldown.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#128128;</div>
+      <div class="g-body">
+        <h3>Lista de alvos: quem entra e por que</h3>
+        <p>Como funciona o registro de jogadores marcados como rivais dentro do sistema, quais as consequencias de entrar nessa lista e como ela e administrada.</p>
+        <div class="g-meta"><span>4 min</span><a href="belobra-guia-lista-alvos.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Dicas</h2>
+  <div class="guide-grid">
+    <div class="guide-card featured">
+      <div class="g-icon">&#128161;</div>
+      <div class="g-body">
+        <h3>Como render mais em servidores concorridos</h3>
+        <p>Truques praticos para não perder tempo esperando fila em servidores cheios como o Belobra, e ainda assim manter uma boa rotina de caçada.</p>
+        <div class="g-meta"><span>6 min</span><a href="belobra-guia-dicas-organizar.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#128683;</div>
+      <div class="g-body">
+        <h3>Respawn lotado? Veja o que fazer</h3>
+        <p>Ideias para não ficar parado enquanto espera a vez em um respawn concorrido, aproveitando o tempo de fila de forma inteligente.</p>
+        <div class="g-meta"><span>5 min</span><a href="belobra-guia-respawn-lotado.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#9876;&#65039;</div>
+      <div class="g-body">
+        <h3>Melhores respawns por faixa de nivel</h3>
+        <p>Sugestoes de locais de caça organizados por nivel de personagem, com dicas de eficiencia e como usar a Cartinha Online pra encontrar o respawn certo pra você.</p>
+        <div class="g-meta"><span>7 min</span><a href="belobra-guia-respawn-por-nivel.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Segurança</h2>
+  <div class="guide-grid">
+    <div class="guide-card featured">
+      <div class="g-icon">&#128274;</div>
+      <div class="g-body">
+        <h3>Por que o login e feito pelo Discord</h3>
+        <p>A lógica por tras de usar o Discord como forma de autenticação, como seus dados ficam protegidos e o passo a passo para vincular sua conta.</p>
+        <div class="g-meta"><span>4 min</span><a href="belobra-guia-discord-auth.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Regras</h2>
+  <div class="guide-grid">
+    <div class="guide-card featured">
+      <div class="g-icon">&#128296;</div>
+      <div class="g-body">
+        <h3>Entendendo o sistema de punições</h3>
+        <p>Como funciona a escala progressiva de penalidades da Cartinha Online, do primeiro aviso até o banimento definitivo, e como evitar cair nela.</p>
+        <div class="g-meta"><span>5 min</span><a href="belobra-guia-punicoes.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Suporte</h2>
+  <div class="guide-grid">
+    <div class="guide-card featured">
+      <div class="g-icon">&#10067;</div>
+      <div class="g-body">
+        <h3>Perguntas frequentes sobre a Cartinha Online</h3>
+        <p>As dúvidas mais comuns dos jogadores reunidas em um só lugar: fila, cadastro, punições, suporte e funcionamento geral da plataforma.</p>
+        <div class="g-meta"><span>10 min</span><a href="belobra-guia-faq.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+    <div class="guide-card featured">
+      <div class="g-icon">&#127915;</div>
+      <div class="g-body">
+        <h3>Abrindo e acompanhando um ticket de suporte</h3>
+        <p>Como pedir ajuda formalmente pela plataforma, o que esperar de cada etapa do atendimento e como acompanhar a resolucao do seu problema.</p>
+        <div class="g-meta"><span>4 min</span><a href="belobra-guia-tickets.html">Ler guia &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>

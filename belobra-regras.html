@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Regras</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --border-livre:#2fbf87;
+    --border-ocupado:#e2574c;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg-page);
+    color:var(--text-primary);
+    font-family:'Segoe UI',Roboto,Arial,sans-serif;
+    min-height:100vh;
+  }
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 32px;
+    flex-wrap:wrap;
+    gap:12px;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;letter-spacing:0.5px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{
+    color:var(--text-secondary);
+    text-decoration:none;
+    font-size:14px;
+  }
+  nav a:hover, nav a.current{color:var(--text-primary);}
+  nav a.current{color:var(--accent-gold);}
+  .support{
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:none !important;
+  }
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-primary);}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:900px;margin:0 auto;padding:32px 24px 80px;}
+
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:28px 32px;
+    margin-bottom:24px;
+  }
+  .card-title{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+  .card-title .bar{width:6px;height:26px;background:var(--accent-gold);border-radius:3px;}
+  .card-title h1{font-size:22px;color:var(--accent-gold);}
+  .subtitle{color:var(--text-secondary);font-size:14px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+
+  ol.rules{list-style:none;counter-reset:rule;}
+  ol.rules li{
+    counter-increment:rule;
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    margin-bottom:22px;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--text-secondary);
+  }
+  ol.rules li::before{
+    content:counter(rule) ".";
+    color:var(--accent-teal);
+    font-weight:700;
+    min-width:22px;
+    flex-shrink:0;
+  }
+  ol.rules li span{display:inline;}
+  ol.rules li b{color:var(--text-primary);font-weight:700;}
+
+  .penalties h2{font-size:18px;color:var(--accent-red);margin-bottom:16px;}
+  .penalty-box{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 24px;
+  }
+  .penalty-row{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:10px 0;
+    flex-wrap:wrap;
+  }
+  .penalty-row + .penalty-row{border-top:1px solid var(--border);}
+  .penalty-tag{
+    font-size:13px;
+    font-weight:700;
+    padding:6px 14px;
+    border-radius:6px;
+    white-space:nowrap;
+    min-width:110px;
+    text-align:center;
+  }
+  .p1{background:rgba(224,169,74,0.15);color:var(--accent-gold);}
+  .p2{background:rgba(226,87,76,0.15);color:#e08a5a;}
+  .p3{background:rgba(226,87,76,0.2);color:#e2716c;}
+  .p4{background:rgba(226,87,76,0.28);color:var(--accent-red);}
+  .penalty-desc{color:var(--text-primary);font-size:14px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html" class="current">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="card-title"><div class="bar"></div><h1>Regras do Servidor e Filas</h1></div>
+    <div class="subtitle">Leia com atenção nossas regras de uso e boa conduta.</div>
+
+    <ol class="rules">
+      <li><span><b>Cadastro Obrigatório:</b> os personagens do usuário, tanto Main quanto Maker, devem pertencer ao mundo Belobra e possuir um cadastro valido. Não e permitido o cadastro de personagens inexistentes; os dados informados devem corresponder exatamente ao que está registrado no servidor oficial do Belobra, hospedado pela CipSoft.</span></li>
+      <li><span><b>Confirmação de Hunt:</b> após chegar sua vez na fila, você tem <b>05 minutos</b> para confirmar o inicio da caçada. O seu tempo total comecara a contar apenas a partir dessa confirmação.</span></li>
+      <li><span><b>Tempo de Caçada:</b> o tempo limite padrao de uso nas hunts para cada jogador e de <b>1 a 3 horas</b>, escolhido pelo jogador ao reservar um lugar na fila. Esse valor recebe mais <b>15 minutos extras</b> para refill, totalizando o tempo escolhido + 15 minutos no tempo total de hunt.</span></li>
+      <li><span><b>Ausencias, Refills e Report AFK:</b> se precisar se ausentar do local (problemas pessoais, ida a cidade, refill de suprimentos, etc.), há uma tolerancia de até <b>20 minutos</b> para o seu retorno. Durante sua hunt, você pode ser alvo do <b>Sistema de Report AFK</b> por outros jogadores. Caso seja reportado, você recebera um alerta e devera <b>confirmar sua presenca</b> no sistema; o não preenchimento desse alerta resultara no <b>cancelamento automático</b> de sua reserva e a hunt será repassada para o próximo da fila.</span></li>
+      <li><span><b>Sair do Respawn:</b> e obrigatório cancelar a sua reserva no painel do sistema caso encerre sua caçada antes do tempo acabar. Por puro bom senso e respeito, passe a fila adiante; se possível, avise ainda o próximo jogador!</span></li>
+      <li><span><b>Intervalo entre Filas (Cooldown):</b> ao sair de uma fila, encerrar sua hunt antecipadamente ou perder o tempo de aceite, você entrara em um <b>cooldown de 5 minutos</b> antes de poder ingressar em uma nova fila.</span></li>
+      <li><span><b>Manipulacao e Monopólio:</b> e expressamente proibido o uso de multiplos personagens (makers) do mesmo jogador ou a coordenacao entre membros de uma mesma Party (PT) para monopolizar o sistema, segurando sequencialmente a posição de "Next" na mesma hunt. A finalidade do sistema e a rotatividade justa; fraudes para reservar o lugar a um mesmo grupo ou grupo de personagens resultara em <b>BANIMENTO PERMANENTE</b>.</span></li>
+      <li><span><b>Terceirizacao e "Apoios":</b> caçar ou "segurar lugar" em uma fila no lugar de terceiros e extremamente proibido. Essa atitude resultara em punições para TODAS as partes envolvidas.</span></li>
+      <li><span><b>Venda, Mudanças e Serviceiros:</b> houve venda ou a troca de nome do character? Utilize a opção no menu de <b>Trocar Personagem</b> para atualizar a conta o mais rapido possível! Em casos de <b>Serviceiros</b> que utilizem o mesmo personagem do proprietário, e necessário abrir um <b>Ticket</b> para que o administrador realize o cadastro do personagem no Discord do Serviceiro.</span></li>
+      <li><span><b>Bom Senso e Conduta:</b> seja <b>EDUCADO</b>! Nenhum tipo de arrogancia ou falta de respeito será tolerada. Problemas devem ser resolvidos de forma passiva. Evite responder a provocacoes, do contrário a sua mensagem impulsiva podera ser motivo de ban. O uso de informações sensiveis (da verdadeira identidade/vida real) ou o emprego de qualquer forma de ameaca estão expressamente proibidos e resultam em sanção direta, rompendo os propositos comunitarios de todo o servidor.</span></li>
+    </ol>
+  </div>
+
+  <div class="penalties">
+    <h2>Punições e Penalidades</h2>
+    <div class="penalty-box">
+      <div class="penalty-row">
+        <span class="penalty-tag p1">1a Infracao</span>
+        <span class="penalty-desc">Warning da Administracao (Aviso formal).</span>
+      </div>
+      <div class="penalty-row">
+        <span class="penalty-tag p2">2a Infracao</span>
+        <span class="penalty-desc">3 Dias de Banimento.</span>
+      </div>
+      <div class="penalty-row">
+        <span class="penalty-tag p3">3a Infracao</span>
+        <span class="penalty-desc">7 Dias de Banimento.</span>
+      </div>
+      <div class="penalty-row">
+        <span class="penalty-tag p4">4a Infracao</span>
+        <span class="penalty-desc">Banimento Permanente do Sistema.</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

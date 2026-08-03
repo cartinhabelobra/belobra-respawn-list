@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Como Render Mais em Servidores Concorridos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  article h2{font-size:18px;color:var(--accent-teal);margin:32px 0 12px;}
+  article p{font-size:15px;line-height:1.75;color:var(--text-primary);margin-bottom:14px;}
+
+  .strat-block{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent-gold);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:16px 0;
+  }
+  .strat-block h3{font-size:15px;margin-bottom:8px;}
+
+  ul.feature-list{list-style:none;margin:12px 0;}
+  ul.feature-list li{font-size:14px;color:var(--text-primary);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--border);}
+  ul.feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);font-weight:700;}
+  ul.feature-list li:last-child{border-bottom:none;}
+
+  table.schedule{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;}
+  table.schedule th, table.schedule td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border);}
+  table.schedule th{color:var(--text-secondary);font-weight:600;}
+  table.schedule td.hor{color:var(--accent-gold);font-weight:700;white-space:nowrap;}
+
+  .tip-box{background:rgba(224,169,74,0.08);border:1px solid rgba(224,169,74,0.3);border-radius:10px;padding:16px 18px;font-size:14px;color:var(--text-primary);margin:18px 0;}
+  .tip-box b{color:var(--accent-gold);}
+
+  .cta{margin-top:32px;padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{display:inline-block;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user"><div class="avatar"></div> Convidado</div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Como render mais em servidores concorridos</h1>
+    <p class="lead">Truques praticos para não perder tempo esperando fila em servidores cheios como o Belobra, e ainda assim manter uma boa rotina de caçada.</p>
+    <div class="meta-line"><span>Publicado em 15/03/2026</span><span>Atualizado em 20/04/2026</span></div>
+
+    <h2>Por que organização faz tanta diferença</h2>
+    <p>Em servidores concorridos como o Belobra, com mais de mil jogadores online ao mesmo tempo em horários de pico, a forma como você organiza sua rotina de hunts e o que separa quem joga só por jogar de quem realmente evolui rapido. Sem planejamento, e fácil perder horas viajando entre respawns lotados, esperando por nada ou entrando em atritos que davam pra evitar.</p>
+    <p>A Cartinha Online já resolve boa parte disso sozinha, mas combinar ela com alguns habitos simples multiplica sua eficiencia. Segue algumas estratégias que funcionam na prática.</p>
+
+    <div class="strat-block">
+      <h3>1. Planeje antes de logar</h3>
+      <p>Antes mesmo de abrir o jogo, da uma olhada na lista de respawns pelo navegador. Confira:</p>
+      <ul class="feature-list">
+        <li>Quais respawns estão livres agora</li>
+        <li>Quantas pessoas já estão na fila dos que você quer</li>
+        <li>Uma previsao de quando uma vaga deve abrir</li>
+      </ul>
+      <p>Com essa informação em maos, fica mais fácil decidir se vale logar naquele momento ou esperar um horário com menos gente.</p>
+    </div>
+
+    <div class="strat-block">
+      <h3>2. Tenha sempre um plano B</h3>
+      <p>Nunca dependa de um único respawn. Vale ter pelo menos 2 ou 3 opções pro seu nivel. Se o preferido está com fila grande, entra na fila de uma alternativa enquanto isso — assim você aproveita melhor o tempo em vez de ficar só esperando.</p>
+    </div>
+
+    <div class="strat-block">
+      <h3>3. Escolha bem o horário</h3>
+      <p>O movimento de jogadores segue um padrao mais ou menos previsivel:</p>
+      <table class="schedule">
+        <tr><th>Período</th><th>Como costuma estar</th></tr>
+        <tr><td class="hor">Manha (6h-12h)</td><td>Menos gente — bom pra hunts longas e tranquilas</td></tr>
+        <tr><td class="hor">Tarde (12h-18h)</td><td>Movimento moderado, principalmente depois do almoço</td></tr>
+        <tr><td class="hor">Noite (18h-00h)</td><td>Horário de pico — filas maiores, respawns disputados</td></tr>
+        <tr><td class="hor">Madrugada (00h-6h)</td><td>Pouquissima concorrencia, mas exige disciplina de horário</td></tr>
+      </table>
+    </div>
+
+    <div class="strat-block">
+      <h3>4. Aproveite o tempo de espera</h3>
+      <p>Ficar na fila não precisa ser tempo perdido. Da pra usar esse período pra:</p>
+      <ul class="feature-list">
+        <li>Fabricar runa e pocao que você vai usar na hunt</li>
+        <li>Organizar inventario e equipamento</li>
+        <li>Avancar quests secundarias ou outras tarefas do servidor</li>
+        <li>Estudar o respawn — rota, spawns, o que esperar de lá</li>
+      </ul>
+    </div>
+
+    <div class="strat-block">
+      <h3>5. Converse com a comunidade</h3>
+      <p>O Discord do Belobra e uma boa ferramenta pra se coordenar com outros jogadores. Uma comunicação respeitosa ajuda a resolver qualquer atrito e deixa o ambiente mais leve pra todo mundo — o sistema existe pra unir a comunidade, não pra criar competicao desnecessaria entre ela.</p>
+      <div class="tip-box"><b>Dica de quem manja:</b> se você encerrou a hunt e sabe que o respawn vai ficar livre, avisar no Discord e um gesto simples que fortalece a comunidade — e que costuma voltar pra você mais cedo ou mais tarde.</div>
+    </div>
+
+    <div class="strat-block">
+      <h3>6. Jogue dentro das regras</h3>
+      <p>Por último, mas não menos importante: joga limpo. O sistema de filas funciona melhor quando todo mundo respeita as regras — sem burlar cooldown, sem usar conta de terceiro, sem monopolizar respawn. A Cartinha Online foi pensada pra beneficiar toda a comunidade, e você faz parte dela.</p>
+    </div>
+
+    <div class="cta">
+      <p>Pronto pra colocar essas estratégias em prática?</p>
+      <a href="belobra-respawn-list.html">Ver lista de respawns</a>
+    </div>
+  </article>
+</main>
+
+</body>
+</html>
