@@ -121,7 +121,7 @@
     <a href="#">Discord</a>
     <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
   </nav>
-  <div class="user"><div class="avatar"></div> Convidado</div>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
 </header>
 
 <main>
@@ -455,5 +455,7 @@ render();
 if(shouldOpenJoin) openJoinModal();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
 </body>
 </html>
