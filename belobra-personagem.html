@@ -166,10 +166,11 @@ function renderCard(){
         </div>
         <div class="warn-note">&#9888;&#65039; Fique <b>deslogado do jogo</b> por alguns minutos antes de clicar em Verificar. Enquanto o personagem esta online, o tibia.com nao atualiza as informacoes publicas dele a tempo, e a verificacao pode nao encontrar o codigo mesmo estando certo.</div>
         <button class="btn-main" onclick="doVerify(${char.id})" id="verify-btn">Ja colei o codigo, Verificar agora</button>
+        <button class="btn-secondary" onclick="doSave()">Errou o nome? Salvar nome novo e gerar outro codigo</button>
         <div class="status-msg" id="status-msg"></div>
       ` : `
         ${char && char.verified ? '<div class="verified-check">&#10003; Personagem verificado com sucesso</div>' : ''}
-        <button class="btn-main" onclick="doSave()">Confirmar e Gerar Codigo</button>
+        <button class="btn-main" onclick="doSave()">${char ? 'Trocar personagem e gerar novo codigo' : 'Confirmar e Gerar Codigo'}</button>
         <div class="status-msg" id="status-msg"></div>
       `}
     </div>
