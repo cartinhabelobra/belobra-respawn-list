@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Central de Suporte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12; --bg-nav:#0e1016; --bg-card:#12151c; --border:#232733;
+    --text-primary:#eef0f5; --text-secondary:#8b8f9c; --text-muted:#5c606c;
+    --accent-gold:#e0a94a; --accent-teal:#2fbf87; --accent-red:#e2574c; --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover{color:var(--text-primary);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:50px 24px 100px;}
+  .page-head{text-align:center;margin-bottom:28px;}
+  .page-head h1{font-size:28px;margin-bottom:10px;}
+  .page-head h1 .accent{background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .page-head p{color:var(--text-secondary);font-size:14px;max-width:460px;margin:0 auto;line-height:1.6;}
+
+  .action-row{display:flex;justify-content:center;gap:12px;margin:26px 0;flex-wrap:wrap;}
+  .action-row button{
+    padding:12px 22px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;border:none;
+  }
+  .action-row .primary{background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);color:#0b0d12;}
+  .action-row .secondary{background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);}
+
+  .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;margin-bottom:20px;}
+  .panel h3{font-size:15px;margin-bottom:16px;}
+  label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;margin-top:14px;}
+  select, textarea, input{
+    width:100%;background:var(--pill-bg);border:1px solid var(--border);
+    color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;font-family:inherit;
+  }
+  textarea{resize:vertical;min-height:110px;}
+  .char-count{font-size:11px;color:var(--text-muted);text-align:right;margin-top:4px;}
+  .file-drop{border:1px dashed var(--border);border-radius:10px;padding:20px;text-align:center;margin-top:14px;font-size:13px;color:var(--text-secondary);}
+  .btn-send{margin-top:20px;width:100%;background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);color:#0b0d12;border:none;padding:13px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;}
+
+  .ticket-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);}
+  .ticket-row:last-child{border-bottom:none;}
+  .ticket-row .cat{font-weight:700;font-size:14px;}
+  .ticket-row .date{font-size:12px;color:var(--text-muted);}
+  .status-chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;}
+  .status-chip.aberto{background:rgba(224,169,74,0.15);color:var(--accent-gold);}
+  .status-chip.em_andamento{background:rgba(91,155,213,0.15);color:#5b9bd5;}
+  .status-chip.respondido{background:rgba(47,191,135,0.15);color:var(--accent-teal);}
+  .status-chip.fechado{background:rgba(139,143,156,0.15);color:var(--text-muted);}
+
+  .empty{padding:40px;text-align:center;color:var(--text-muted);font-size:14px;}
+  .login-wall{text-align:center;padding:40px;color:var(--text-secondary);font-size:14px;}
+  .login-wall button{margin-top:16px;background:#5865F2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:700;cursor:pointer;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatisticas</a>
+    <a href="#">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <div class="page-head">
+    <h1>Central de <span class="accent">Suporte</span></h1>
+    <p>Precisa de ajuda? Abra um ticket e a nossa administracao responde o mais rapido possivel.</p>
+  </div>
+
+  <div id="app-area"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+<script>
+let view = 'list'; // 'list' ou 'new'
+let myTickets = [];
+let myCharacters = [];
+
+async function boot(){
+  const user = await belobraGetUser();
+  const area = document.getElementById('app-area');
+
+  if(!user){
+    area.innerHTML = `
+      <div class="panel">
+        <div class="login-wall">
+          Voce precisa estar logado com o Discord pra abrir ou ver tickets.
+          <br>
+          <button onclick="belobraSignInDiscord()">Entrar com Discord</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  myCharacters = await belobraGetMyCharacters();
+  await loadTickets();
+  render();
+}
+
+async function loadTickets(){
+  const user = await belobraGetUser();
+  const { data, error } = await supabaseClient
+    .from('tickets')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('created_at', { ascending: false });
+  myTickets = error ? [] : data;
+}
+
+function render(){
+  const area = document.getElementById('app-area');
+
+  const actionRow = `
+    <div class="action-row">
+      <button class="${view==='list'?'primary':'secondary'}" onclick="setView('list')">&#128203; Meus Tickets</button>
+      <button class="${view==='new'?'primary':'secondary'}" onclick="setView('new')">&#10133; Novo Ticket</button>
+    </div>
+  `;
+
+  if(view === 'new'){
+    const charOptions = myCharacters.map(c => `<option value="${c.id}">${c.name} (${c.type==='main'?'Principal':'Maker'})</option>`).join('');
+    area.innerHTML = actionRow + `
+      <div class="panel">
+        <h3>Abrir novo ticket</h3>
+        <label>Personagem afetado</label>
+        <select id="ticket-char">
+          <option value="">-- Escolha o personagem --</option>
+          ${charOptions}
+        </select>
+
+        <label>Categoria do chamado</label>
+        <select id="ticket-cat">
+          <option>Problemas na Fila de Espera</option>
+          <option>Cadastro / Verificacao de Personagem</option>
+          <option>Revisao de Banimento</option>
+          <option>Bug ou Erro no Sistema</option>
+          <option>Denuncia de Jogador</option>
+          <option>Sugestao</option>
+          <option>Outro</option>
+        </select>
+
+        <label>Descricao detalhada / motivo</label>
+        <textarea id="ticket-desc" maxlength="2000" oninput="updateTicketCount()" placeholder="Explique o que aconteceu com o maximo de detalhes..."></textarea>
+        <div class="char-count" id="ticket-count">0/2000</div>
+
+        <div class="file-drop">Anexar provas (imagens/videos) &mdash; em breve. Por enquanto, descreva o ocorrido com detalhes no texto.</div>
+
+        <button class="btn-send" onclick="sendTicket()">Enviar Ticket</button>
+        <div class="char-count" id="ticket-status" style="text-align:left;margin-top:10px;"></div>
+      </div>
+    `;
+  } else {
+    const rows = myTickets.map(t => `
+      <div class="ticket-row">
+        <div>
+          <div class="cat">${escapeHtmlLocal(t.category)}</div>
+          <div class="date">${new Date(t.created_at).toLocaleString('pt-BR')}</div>
+        </div>
+        <span class="status-chip ${t.status}">${statusLabel(t.status)}</span>
+      </div>
+    `).join('');
+
+    area.innerHTML = actionRow + `
+      <div class="panel">
+        <h3>Meus tickets</h3>
+        ${myTickets.length === 0 ? '<div class="empty">Nenhum ticket ainda. Clique em "Novo Ticket" se precisar de ajuda.</div>' : rows}
+      </div>
+    `;
+  }
+}
+
+function statusLabel(s){
+  return { aberto:'Aberto', em_andamento:'Em andamento', respondido:'Respondido', fechado:'Fechado' }[s] || s;
+}
+function escapeHtmlLocal(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function setView(v){
+  view = v;
+  render();
+}
+
+function updateTicketCount(){
+  const val = document.getElementById('ticket-desc').value;
+  document.getElementById('ticket-count').textContent = val.length + '/2000';
+}
+
+async function sendTicket(){
+  const user = await belobraGetUser();
+  const charId = document.getElementById('ticket-char').value || null;
+  const category = document.getElementById('ticket-cat').value;
+  const description = document.getElementById('ticket-desc').value.trim();
+  const statusEl = document.getElementById('ticket-status');
+
+  if(!description){
+    statusEl.textContent = 'Escreva uma descricao antes de enviar.';
+    return;
+  }
+
+  const { error } = await supabaseClient.from('tickets').insert({
+    profile_id: user.id,
+    character_id: charId,
+    category,
+    description
+  });
+
+  if(error){
+    statusEl.textContent = 'Erro ao enviar: ' + error.message;
+  } else {
+    await loadTickets();
+    setView('list');
+  }
+}
+
+boot();
+</script>
+
+</body>
+</html>

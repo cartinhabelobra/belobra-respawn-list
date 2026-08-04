@@ -47,8 +47,11 @@ async function belobraRenderUserWidget(){
       <div class="belobra-user-menu" style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="belobraToggleUserMenu()">
         ${avatarUrl ? `<img src="${avatarUrl}" style="width:26px;height:26px;border-radius:50%;">` : '<div class="avatar"></div>'}
         <span>${name}</span>
-        <div id="belobra-user-dropdown" style="display:none;position:absolute;top:56px;right:24px;background:#12151c;border:1px solid #232733;border-radius:10px;padding:8px;min-width:140px;z-index:20;">
-          <button onclick="belobraSignOut()" style="width:100%;background:none;border:none;color:#eef0f5;padding:8px 10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;">Sair</button>
+        <div id="belobra-user-dropdown" style="display:none;position:absolute;top:56px;right:24px;background:#12151c;border:1px solid #232733;border-radius:10px;padding:8px;min-width:180px;z-index:20;">
+          <a href="belobra-personagem.html" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#eef0f5;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;text-decoration:none;">&#9999;&#65039; Trocar Personagem</a>
+          <a href="belobra-suporte.html" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#eef0f5;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;text-decoration:none;">&#128231; Central de Suporte</a>
+          <div style="height:1px;background:#232733;margin:4px 0;"></div>
+          <button onclick="belobraSignOut()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#e2574c;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;">&#8618; Sair</button>
         </div>
       </div>
     `;
@@ -75,3 +78,75 @@ supabaseClient.auth.onAuthStateChange((_event, _session) => {
 
 // Roda assim que a pagina carrega
 document.addEventListener('DOMContentLoaded', belobraRenderUserWidget);
+
+// ------------------------------------------------------------
+// Personagens (Main / Maker)
+// ------------------------------------------------------------
+function belobraGenerateCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<10;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+async function belobraGetMyCharacters(){
+  const user = await belobraGetUser();
+  if(!user) return [];
+  const { data, error } = await supabaseClient
+    .from('characters')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('type', { ascending: true });
+  if(error){ console.error(error); return []; }
+  return data;
+}
+
+// Retorna so os personagens VERIFICADOS do usuario logado (para usar nas filas)
+async function belobraGetVerifiedCharacters(){
+  const all = await belobraGetMyCharacters();
+  return all.filter(c => c.verified);
+}
+
+// Cria ou atualiza um personagem (Main ou Maker) com um novo codigo de verificacao
+async function belobraSaveCharacter(name, type){
+  const user = await belobraGetUser();
+  if(!user) throw new Error('Voce precisa estar logado.');
+
+  const code = belobraGenerateCode();
+
+  // Verifica se ja existe um personagem desse tipo pro usuario
+  const { data: existing } = await supabaseClient
+    .from('characters')
+    .select('id')
+    .eq('profile_id', user.id)
+    .eq('type', type)
+    .maybeSingle();
+
+  if(existing){
+    const { data, error } = await supabaseClient
+      .from('characters')
+      .update({ name, verification_code: code, verified: false })
+      .eq('id', existing.id)
+      .select()
+      .single();
+    if(error) throw error;
+    return data;
+  } else {
+    const { data, error } = await supabaseClient
+      .from('characters')
+      .insert({ profile_id: user.id, name, type, verification_code: code, verified: false })
+      .select()
+      .single();
+    if(error) throw error;
+    return data;
+  }
+}
+
+// Chama a Edge Function que confere o comentario do personagem no tibia.com
+async function belobraVerifyCharacter(characterId){
+  const { data, error } = await supabaseClient.functions.invoke('verify-character', {
+    body: { character_id: characterId }
+  });
+  if(error) throw error;
+  return data; // { verified: true/false, message: '...' }
+}
