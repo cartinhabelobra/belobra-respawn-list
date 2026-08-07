@@ -144,9 +144,130 @@ async function belobraSaveCharacter(name, type){
 
 // Chama a Edge Function que confere o comentario do personagem no tibia.com
 async function belobraVerifyCharacter(characterId){
-  const { data, error } = await supabaseClient.functions.invoke('verify-character', {
+  const { data, error } = await supabaseClient.functions.invoke('swift-responder', {
     body: { character_id: characterId }
   });
   if(error) throw error;
   return data; // { verified: true/false, message: '...' }
+}
+
+// ------------------------------------------------------------
+// RESPAWNS (lista vinda do banco, nao mais fixa no codigo)
+// ------------------------------------------------------------
+async function belobraGetRespawns(){
+  const { data, error } = await supabaseClient
+    .from('respawns')
+    .select('id, name')
+    .order('name', { ascending: true });
+  if(error) throw error;
+  return data;
+}
+
+// ------------------------------------------------------------
+// FILA DE RESPAWN (compartilhada entre todos os jogadores)
+// ------------------------------------------------------------
+function belobraGroupQueueRows(rows){
+  let active = null, calling = null;
+  const waiting = [];
+  rows.forEach(r => {
+    const entry = {
+      id: r.id,
+      name: r.characters ? r.characters.name : '???',
+      type: r.characters ? r.characters.type : 'main',
+      durationMin: r.duration_min,
+      joinedAt: new Date(r.joined_at).getTime(),
+      startedAt: r.started_at ? new Date(r.started_at).getTime() : null,
+      deadline: r.call_deadline ? new Date(r.call_deadline).getTime() : null,
+      characterId: r.character_id
+    };
+    if(r.status === 'active') active = entry;
+    else if(r.status === 'calling') calling = entry;
+    else waiting.push(entry);
+  });
+  waiting.sort((a,b) => a.joinedAt - b.joinedAt);
+  return { active, calling, waiting };
+}
+
+async function belobraLoadRespawnQueue(respawnId){
+  const { data, error } = await supabaseClient
+    .from('queue_entries')
+    .select('id, respawn_id, character_id, status, duration_min, joined_at, started_at, call_deadline, characters(name, type)')
+    .eq('respawn_id', respawnId)
+    .order('joined_at', { ascending: true });
+  if(error){ console.error(error); return { active:null, calling:null, waiting:[] }; }
+  return belobraGroupQueueRows(data);
+}
+
+// Avanca o estado da fila: encerra hunts/chamadas vencidas e chama o proximo.
+// Qualquer jogador que estiver com a pagina aberta ajuda a "empurrar" esse relogio.
+async function belobraTickRespawnQueue(respawnId){
+  const q = await belobraLoadRespawnQueue(respawnId);
+  const now = Date.now();
+
+  if(q.active){
+    const totalMs = (q.active.durationMin + 15) * 60000;
+    if(now - q.active.startedAt >= totalMs){
+      await supabaseClient.from('queue_entries').delete().eq('id', q.active.id);
+      return belobraTickRespawnQueue(respawnId);
+    }
+  }
+  if(q.calling && now > q.calling.deadline){
+    await supabaseClient.from('queue_entries').delete().eq('id', q.calling.id);
+    return belobraTickRespawnQueue(respawnId);
+  }
+  if(!q.active && !q.calling && q.waiting.length > 0){
+    const next = q.waiting[0];
+    await supabaseClient
+      .from('queue_entries')
+      .update({ status:'calling', call_deadline: new Date(now + 5*60000).toISOString() })
+      .eq('id', next.id);
+    return belobraLoadRespawnQueue(respawnId);
+  }
+  return q;
+}
+
+function belobraIsOcupado(q){ return !!q.active || !!q.calling; }
+function belobraQueueCount(q){ return q.waiting.length + (q.calling ? 1 : 0); }
+
+async function belobraJoinRespawnQueue(respawnId, characterId, durationMin){
+  const { error } = await supabaseClient.from('queue_entries').insert({
+    respawn_id: respawnId,
+    character_id: characterId,
+    duration_min: durationMin,
+    status: 'waiting',
+    joined_at: new Date().toISOString()
+  });
+  if(error) throw error;
+}
+
+async function belobraEndHunt(entryId){
+  const { error } = await supabaseClient.from('queue_entries').delete().eq('id', entryId);
+  if(error) throw error;
+}
+
+async function belobraAcceptVaga(entryId){
+  const { error } = await supabaseClient
+    .from('queue_entries')
+    .update({ status:'active', started_at: new Date().toISOString(), call_deadline: null })
+    .eq('id', entryId);
+  if(error) throw error;
+}
+
+async function belobraLeaveQueueEntry(entryId){
+  const { error } = await supabaseClient.from('queue_entries').delete().eq('id', entryId);
+  if(error) throw error;
+}
+
+// Todas as filas de uma vez (usado na lista principal, pra mostrar status/contagem de cada card)
+async function belobraLoadAllQueueStatus(){
+  const { data, error } = await supabaseClient.from('queue_entries').select('respawn_id, status');
+  const map = {};
+  if(error){ console.error(error); return map; }
+  (data || []).forEach(r => {
+    if(!map[r.respawn_id]) map[r.respawn_id] = { active:false, calling:false, waitingCount:0 };
+    if(r.status === 'active') map[r.respawn_id].active = true;
+    else if(r.status === 'calling') map[r.respawn_id].calling = true;
+    else map[r.respawn_id].waitingCount++;
+  });
+  return map;
 }

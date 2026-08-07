@@ -35,7 +35,6 @@
   nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
   nav a:hover{color:var(--text-primary);}
   .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;}
-  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
   .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
 
   main{max-width:1100px;margin:0 auto;padding:28px 24px 90px;}
@@ -66,6 +65,7 @@
     font-weight:800;font-size:13px;cursor:pointer;
   }
   .btn-join:disabled{opacity:0.5;cursor:not-allowed;}
+  .btn-join.discord{background:#5865F2;color:#fff;}
 
   .queue-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
   .queue-panel-head{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border);font-weight:700;font-size:15px;}
@@ -99,14 +99,19 @@
 
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:50;padding:20px;}
   .modal-overlay.show{display:flex;}
-  .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:380px;}
+  .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:400px;}
   .modal-box h3{font-size:16px;margin-bottom:16px;}
   .modal-box label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;margin-top:14px;}
-  .modal-box input, .modal-box select{width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;}
+  .modal-box select{width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;}
   .modal-actions{display:flex;gap:10px;margin-top:22px;}
   .modal-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
   .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;}
   .modal-actions .cancel{background:var(--pill-bg);color:var(--text-primary);border:1px solid var(--border);}
+  .char-option{display:flex;align-items:center;gap:10px;background:var(--pill-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:10px;cursor:pointer;}
+  .char-option input{margin:0;}
+  .char-option.selected{border-color:var(--accent-teal);}
+  .no-char-warn{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:10px;}
+  .no-char-warn a{color:var(--accent-gold);}
 </style>
 </head>
 <body>
@@ -134,7 +139,7 @@
 
   <div class="rp-head">
     <div>
-      <h1 id="rp-title">Respawn</h1>
+      <h1 id="rp-title">Carregando...</h1>
       <div class="desc">Sem descricao</div>
     </div>
     <div class="rp-actions">
@@ -165,13 +170,7 @@
 <div class="modal-overlay" id="join-modal">
   <div class="modal-box">
     <h3>Entrar na fila</h3>
-    <label>Nome do personagem</label>
-    <input type="text" id="input-name" placeholder="Ex: Monks Lord">
-    <label>Tipo</label>
-    <select id="input-type">
-      <option value="main">Personagem Principal</option>
-      <option value="maker">Maker</option>
-    </select>
+    <div id="modal-char-area"></div>
     <label>Tempo de hunt</label>
     <select id="input-duration">
       <option value="60">1 hora (+15min refill)</option>
@@ -180,129 +179,36 @@
     </select>
     <div class="modal-actions">
       <button class="cancel" onclick="closeJoinModal()">Cancelar</button>
-      <button class="confirm" onclick="confirmJoin()">Confirmar</button>
+      <button class="confirm" onclick="confirmJoin()" id="modal-confirm-btn">Confirmar</button>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
 <script>
-const RESPAWNS = [
-"Roshamuul - Prison -3","Roshamuul - Roshamuul North","Roshamuul - Guzzlehole Gorge",
-"Warzone - Warzone 1","Warzone - Warzone 2","Warzone - Warzone 4",
-"Warzone - Warzone 5","Warzone - Warzone 6","Warzone - Warzone 8",
-"Zao - Draken","Venore - Ripper Spectre","Venore - Buried Cathedral -3",
-"Port Hope - Mitmah (Santuario)","Port Hope - Gazer Spectre","Issavi - Goannas (norte)",
-"Port Hope - Lost Soul","Darashia - Infinity","Venore - Buried Cathedral -1",
-"Venore - Buried Cathedral -2","Issavi - Girtabilu","Issavi - Bueiros",
-"Issavi - Goannas (sul)","Port Hope - Mitmah (entrada)","Carlin - Ice Library",
-"Warzone - Warzone 7 (andar -2)","Thais - MOTA -1","Zao - Dragaozinho +1",
-"Warzone - Warzone 3","Zao - Dragaozinho Terreo","Ab'Dendriel - Inner Crypt",
-"Roshamuul - Roshamuul Upper","Zao - Falcon Aguia","Carlin - Ice Library Alternativa",
-"Carlin - Fire Library","Darashia - Ferumbras DT Seal -1","Darashia - Ferumbras Infernatil",
-"Darashia - Ferumbras Jugger Seal -1","Darashia - Ferumbras Jugger Seal -2","Darashia - Ferumbras Plague -1",
-"Darashia - Ferumbras Pumin Seal -3","Darashia - Ferumbras Undead Seal -1","Darashia - Ferumbras Undead Seal -2",
-"Edron - DT Inquisition","Edron - Ingol -1","Edron - Ingol -2",
-"Edron - Ingol -3","Edron - Ingol -4","Edron - Ingol Surface Esquerda",
-"Darashia - Cobra -1","Darashia - Cobra Bastion","Darashia - Deep Desert -2",
-"Darashia - Ferumbras Bazir Seal","Darashia - Nightmare Isles","Edron - Azillon -1",
-"Edron - Azillon -2","Edron - Azillon -3","Edron - Azillon -4",
-"Edron - Azillon Castle","Edron - Carnisys/Anni","Edron - Lost Soul",
-"Zao - Falcon Castle","Zao - Draken Walls (Sul)","Venore - Lost Soul -1",
-"Venore - Lost Soul -2","Venore - Lost Soul -3","Oramond - Undead Dragon",
-"Issavi - Puzzle","Plains of Havoc - Bulltar -1","Plains of Havoc - Bulltar -2",
-"Port Hope - Asura (Palace)","Feyrist - Weakened Frazzlemaw -1","Feyrist - Weakened Frazzlemaw -2",
-"Feyrist - Elfo de Fogo (Castelo)","Svargrond - Elfo de Gelo","Oramond - Glooth Factory",
-"Gray Island - Deathling","Vengoth - Norcferatu Fortress","Vengoth - Norcferatu Dungeon (West)",
-"Vengoth - Norcferatu Dungeon (East)","Warzone - Warzone 7 (andar -1)","Edron - Podzila Rootthings -2",
-"Marapur - Nagas","Oramond - Catacombs Esquerda","Oramond - Catacombs Direita",
-"Thais - MOTA -2","Thais - MOTA -3","Roshamuul - Lower Roshamuul",
-"Oskayaat - Weretiger -1","Oskayaat - Weretiger -2","Oskayaat - Werecrocodile -1",
-"Oskayaat - Werecrocodile -2","Carlin - Energy Library Terreo","Darashia - Caminho Ferumbras -1 (escada)",
-"Issavi - Ogre (cachoeira)","Roshamuul - Prison -1","Roshamuul - Prison -2",
-"Issavi - Sphinx -2","Oramond - Furys","Roshamuul - Shock Head (after bones)",
-"Marapur - Tartaruguinhas","Port Hope - Carnivoras","Venore - POI Ashfalor Seal",
-"Edron - Book World -3","Edron - Book World -1","Edron - Bounac Crypt Warriors",
-"Oramond - Glooth Tower","Roshamuul - Tubaroes","Venore - POI Bazir Seal",
-"Venore - POI Pumin Seal","Venore - POI Tafariel Seal","Venore - POI Infernatil Seal",
-"Venore - POI Verminor Seal","Darashia - Caminho Last Ferumbras","Edron - Raubritter Castelo",
-"Darashia - Werelions -2","Edron - Raubritter Subsolo","Carlin - Energy Library -1",
-"Darashia - Caminho Last Ferumbras n8","Darashia - Ferumbras DT Seal -2","Darashia - Ferumbras Infernatil +1",
-"Darashia - Ferumbras Plague -2","Darashia - Ferumbras Pumin Seal -1 e -2","Edron - Ingol -5",
-"Edron - Ingol Surface Direita","Candia - Chocolate Mines -1 e -2","Darashia - Burster Spectre",
-"Darashia - Deep Desert -3","Darashia - Grim Reaper","Darashia - Werelions -1",
-"Edron - Book World -2","Edron - Orc Cult","Edron - Bounac Usurpers",
-"Edron - Podzila Quaras","Zao - Draken Walls (Norte)","Yalahar - Grim Reaper",
-"Edron - Podzila Rootthings -1","Warzone - Warzone 9","Svargrond - Elf de Gelo (teleport)",
-"Feyrist - Elf de Fogo (Teleport)","Darashia - Caminho Ferumbras (volta completa)"
-];
-
 const params = new URLSearchParams(location.search);
-const id = parseInt(params.get('id'), 10);
+const respawnId = params.get('id');
 const shouldOpenJoin = params.get('join') === '1';
-const respawnName = RESPAWNS[id] || 'Respawn nao encontrado';
-document.getElementById('rp-title').textContent = respawnName;
-document.title = 'Belobra Respawn List - ' + respawnName;
 
-// ===== Mesmo motor de fila usado na lista principal (localStorage) =====
-const QUEUE_PREFIX = "belobra_queue_";
+let selectedCharacterId = null;
+let myVerifiedCharacters = [];
 
-function loadQueue(qid){
-  try{
-    const raw = localStorage.getItem(QUEUE_PREFIX + qid);
-    return raw ? JSON.parse(raw) : { active: null, waiting: [], calling: null };
-  }catch(e){
-    return { active: null, waiting: [], calling: null };
+async function boot(){
+  if(!respawnId){
+    document.getElementById('rp-title').textContent = 'Respawn nao encontrado';
+    return;
   }
-}
-function saveQueue(qid, q){
-  localStorage.setItem(QUEUE_PREFIX + qid, JSON.stringify(q));
-}
-function tickQueue(qid){
-  const q = loadQueue(qid);
-  const now = Date.now();
-  let changed = false;
 
-  if(q.active){
-    const totalMs = (q.active.durationMin + 15) * 60000;
-    if(now - q.active.startedAt >= totalMs){
-      q.active = null;
-      changed = true;
-    }
-  }
-  if(q.calling && now > q.calling.deadline){
-    q.calling = null;
-    changed = true;
-  }
-  if(!q.active && !q.calling && q.waiting.length > 0){
-    const next = q.waiting.shift();
-    q.calling = { name: next.name, type: next.type, durationMin: next.durationMin, deadline: now + 5*60000, joinedAt: next.joinedAt };
-    changed = true;
-  }
-  if(changed) saveQueue(qid, q);
-  return q;
-}
-function queueCount(q){ return q.waiting.length + (q.calling ? 1 : 0); }
-function isOcupado(q){ return !!q.active || !!q.calling; }
-// ===============================================================================
+  const { data: respawn } = await supabaseClient.from('respawns').select('id, name').eq('id', respawnId).single();
+  document.getElementById('rp-title').textContent = respawn ? respawn.name : 'Respawn nao encontrado';
+  document.title = 'Belobra Respawn List - ' + (respawn ? respawn.name : '');
 
-function playSiren(){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    const now = ctx.currentTime;
-    for(let i=0;i<4;i++){
-      osc.frequency.setValueAtTime(600, now + i*0.4);
-      osc.frequency.linearRampToValueAtTime(900, now + i*0.4 + 0.2);
-      osc.frequency.linearRampToValueAtTime(600, now + i*0.4 + 0.4);
-    }
-    osc.start(now);
-    osc.stop(now + 1.6);
-  }catch(e){ /* audio indisponivel neste navegador */ }
+  await render();
+  setInterval(render, 1000);
+  setInterval(async () => { await belobraTickRespawnQueue(respawnId); }, 3000);
+
+  if(shouldOpenJoin) openJoinModal();
 }
 
 function fmtTime(ts){ return new Date(ts).toTimeString().slice(0,5); }
@@ -322,22 +228,54 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
+function playSiren(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    const now = ctx.currentTime;
+    for(let i=0;i<4;i++){
+      osc.frequency.setValueAtTime(600, now + i*0.4);
+      osc.frequency.linearRampToValueAtTime(900, now + i*0.4 + 0.2);
+      osc.frequency.linearRampToValueAtTime(600, now + i*0.4 + 0.4);
+    }
+    osc.start(now);
+    osc.stop(now + 1.6);
+  }catch(e){ /* audio indisponivel */ }
+}
+
 let sirenPlayedFor = null;
 
-function render(){
-  const q = tickQueue(id);
+async function render(){
+  const q = await belobraLoadRespawnQueue(respawnId);
   const now = Date.now();
 
   const pill = document.getElementById('status-pill');
   const joinBtn = document.getElementById('join-btn');
-  const ocupado = isOcupado(q);
+  const ocupado = belobraIsOcupado(q);
   pill.className = 'status-pill ' + (ocupado ? 'ocupado' : 'livre');
   pill.innerHTML = ocupado ? '&#9679; OCUPADO' : '&#9679; LIVRE';
-  joinBtn.disabled = queueCount(q) >= 10;
+
+  const user = await belobraGetUser();
+  if(!user){
+    joinBtn.textContent = 'Entrar com Discord pra caçar';
+    joinBtn.classList.add('discord');
+    joinBtn.onclick = belobraSignInDiscord;
+    joinBtn.disabled = false;
+  } else {
+    joinBtn.textContent = 'Entrar na Fila';
+    joinBtn.classList.remove('discord');
+    joinBtn.onclick = openJoinModal;
+    joinBtn.disabled = belobraQueueCount(q) >= 10;
+  }
 
   const banner = document.getElementById('siren-banner');
   if(q.calling){
-    const callKey = q.calling.name + q.calling.deadline;
+    const callKey = q.calling.id + '-' + q.calling.deadline;
     if(sirenPlayedFor !== callKey){
       playSiren();
       sirenPlayedFor = callKey;
@@ -348,7 +286,7 @@ function render(){
     banner.classList.remove('show');
   }
 
-  document.getElementById('queue-count').textContent = (q.active?1:0) + queueCount(q);
+  document.getElementById('queue-count').textContent = (q.active?1:0) + belobraQueueCount(q);
 
   const rows = [];
   if(q.active) rows.push({ kind:'active', ...q.active });
@@ -372,21 +310,20 @@ function render(){
         statusCell = '<span class="chip cacando">&#9876;&#65039; CACANDO</span>';
         const remain = (r.durationMin + 15) * 60000 - (now - r.startedAt);
         timeCell = '<span class="timer-chip">&#9201; ' + fmtHuntRemaining(remain) + '</span>';
-        actionsCell = '<button class="btn-mini end" onclick="endHunt()">Encerrar Hunt</button>';
+        actionsCell = '<button class="btn-mini end" onclick="endHunt(' + r.id + ')">Encerrar Hunt</button>';
         previstoCell = '<span class="previsto">Em andamento</span>';
       } else if(r.kind === 'calling'){
         statusCell = '<span class="chip aguardando">&#128276; AGUARDANDO</span>';
         const remain = r.deadline - now;
         timeCell = '<span class="timer-chip countdown">&#9201; ' + fmtCountdown(remain) + '</span>';
         actionsCell = '<div class="row-actions">' +
-          '<button class="btn-mini accept" onclick="acceptVaga()">Aceitar Vaga</button>' +
-          '<button class="btn-mini cancel" onclick="giveUpCalling()">Desistir</button></div>';
+          '<button class="btn-mini accept" onclick="acceptVaga(' + r.id + ')">Aceitar Vaga</button>' +
+          '<button class="btn-mini cancel" onclick="leaveQueue(' + r.id + ')">Desistir</button></div>';
         previstoCell = '<span class="previsto">Confirmar agora</span>';
       } else {
         statusCell = '<span class="chip fila">&#9203; NA FILA</span>';
         timeCell = '<span class="muted">&mdash;</span>';
-        const waitIdx = i - ((q.active?1:0) + (q.calling?1:0));
-        actionsCell = '<button class="btn-mini cancel" onclick="leaveWaiting(' + waitIdx + ')">Sair da fila</button>';
+        actionsCell = '<button class="btn-mini cancel" onclick="leaveQueue(' + r.id + ')">Sair da fila</button>';
         previstoCell = '<span class="previsto">Na fila</span>';
       }
 
@@ -402,60 +339,78 @@ function render(){
   }
 }
 
-function openJoinModal(){
+async function openJoinModal(){
+  const user = await belobraGetUser();
+  if(!user){ belobraSignInDiscord(); return; }
+
+  const allChars = await belobraGetMyCharacters();
+  myVerifiedCharacters = allChars.filter(c => c.verified);
+  selectedCharacterId = myVerifiedCharacters.length ? myVerifiedCharacters[0].id : null;
+
+  const area = document.getElementById('modal-char-area');
+  const confirmBtn = document.getElementById('modal-confirm-btn');
+
+  if(myVerifiedCharacters.length === 0){
+    area.innerHTML = `
+      <div class="no-char-warn">
+        Voce ainda nao tem nenhum personagem verificado. Cadastre e verifique um personagem antes de entrar na fila.
+        <br><a href="belobra-personagem.html">Ir para Trocar Personagem &#8594;</a>
+      </div>`;
+    confirmBtn.disabled = true;
+  } else {
+    confirmBtn.disabled = false;
+    area.innerHTML = `
+      <label>Qual personagem vai usar?</label>
+      ${myVerifiedCharacters.map(c => `
+        <label class="char-option ${c.id === selectedCharacterId ? 'selected' : ''}" onclick="selectChar(${c.id})">
+          <input type="radio" name="char-radio" value="${c.id}" ${c.id === selectedCharacterId ? 'checked' : ''}>
+          <span>${escapeHtml(c.name)} <span class="muted">(${c.type === 'main' ? 'Principal' : 'Maker'})</span></span>
+        </label>
+      `).join('')}
+    `;
+  }
+
   document.getElementById('join-modal').classList.add('show');
-  document.getElementById('input-name').value = '';
-  document.getElementById('input-name').focus();
 }
+
+function selectChar(id){
+  selectedCharacterId = id;
+  document.querySelectorAll('.char-option').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+}
+
 function closeJoinModal(){
   document.getElementById('join-modal').classList.remove('show');
 }
-function confirmJoin(){
-  const name = document.getElementById('input-name').value.trim();
-  if(!name){ alert('Digite o nome do personagem.'); return; }
-  const type = document.getElementById('input-type').value;
-  const durationMin = parseInt(document.getElementById('input-duration').value, 10);
 
-  const q = loadQueue(id);
-  q.waiting.push({ name, type, durationMin, joinedAt: Date.now() });
-  saveQueue(id, q);
-  closeJoinModal();
-  render();
-}
-function endHunt(){
-  const q = loadQueue(id);
-  q.active = null;
-  saveQueue(id, q);
-  render();
-}
-function acceptVaga(){
-  const q = loadQueue(id);
-  if(q.calling){
-    q.active = { name: q.calling.name, type: q.calling.type, durationMin: q.calling.durationMin, startedAt: Date.now() };
-    q.calling = null;
-    saveQueue(id, q);
+async function confirmJoin(){
+  if(!selectedCharacterId) return;
+  const durationMin = parseInt(document.getElementById('input-duration').value, 10);
+  try{
+    await belobraJoinRespawnQueue(respawnId, selectedCharacterId, durationMin);
+    closeJoinModal();
+    await belobraTickRespawnQueue(respawnId);
     render();
+  }catch(e){
+    alert('Erro ao entrar na fila: ' + e.message);
   }
 }
-function giveUpCalling(){
-  const q = loadQueue(id);
-  q.calling = null;
-  saveQueue(id, q);
+
+async function endHunt(entryId){
+  await belobraEndHunt(entryId);
   render();
 }
-function leaveWaiting(idx){
-  const q = loadQueue(id);
-  q.waiting.splice(idx, 1);
-  saveQueue(id, q);
+async function acceptVaga(entryId){
+  await belobraAcceptVaga(entryId);
+  render();
+}
+async function leaveQueue(entryId){
+  await belobraLeaveQueueEntry(entryId);
   render();
 }
 
-setInterval(render, 1000);
-render();
-if(shouldOpenJoin) openJoinModal();
+boot();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="belobra-app.js"></script>
 </body>
 </html>

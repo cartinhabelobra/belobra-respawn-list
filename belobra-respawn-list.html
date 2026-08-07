@@ -217,118 +217,35 @@
   <div class="grid" id="grid"></div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
 <script>
-const RESPAWNS = [
-"Roshamuul - Prison -3","Roshamuul - Roshamuul North","Roshamuul - Guzzlehole Gorge",
-"Warzone - Warzone 1","Warzone - Warzone 2","Warzone - Warzone 4",
-"Warzone - Warzone 5","Warzone - Warzone 6","Warzone - Warzone 8",
-"Zao - Draken","Venore - Ripper Spectre","Venore - Buried Cathedral -3",
-"Port Hope - Mitmah (Santuario)","Port Hope - Gazer Spectre","Issavi - Goannas (norte)",
-"Port Hope - Lost Soul","Darashia - Infinity","Venore - Buried Cathedral -1",
-"Venore - Buried Cathedral -2","Issavi - Girtabilu","Issavi - Bueiros",
-"Issavi - Goannas (sul)","Port Hope - Mitmah (entrada)","Carlin - Ice Library",
-"Warzone - Warzone 7 (andar -2)","Thais - MOTA -1","Zao - Dragaozinho +1",
-"Warzone - Warzone 3","Zao - Dragaozinho Terreo","Ab'Dendriel - Inner Crypt",
-"Roshamuul - Roshamuul Upper","Zao - Falcon Aguia","Carlin - Ice Library Alternativa",
-"Carlin - Fire Library","Darashia - Ferumbras DT Seal -1","Darashia - Ferumbras Infernatil",
-"Darashia - Ferumbras Jugger Seal -1","Darashia - Ferumbras Jugger Seal -2","Darashia - Ferumbras Plague -1",
-"Darashia - Ferumbras Pumin Seal -3","Darashia - Ferumbras Undead Seal -1","Darashia - Ferumbras Undead Seal -2",
-"Edron - DT Inquisition","Edron - Ingol -1","Edron - Ingol -2",
-"Edron - Ingol -3","Edron - Ingol -4","Edron - Ingol Surface Esquerda",
-"Darashia - Cobra -1","Darashia - Cobra Bastion","Darashia - Deep Desert -2",
-"Darashia - Ferumbras Bazir Seal","Darashia - Nightmare Isles","Edron - Azillon -1",
-"Edron - Azillon -2","Edron - Azillon -3","Edron - Azillon -4",
-"Edron - Azillon Castle","Edron - Carnisys/Anni","Edron - Lost Soul",
-"Zao - Falcon Castle","Zao - Draken Walls (Sul)","Venore - Lost Soul -1",
-"Venore - Lost Soul -2","Venore - Lost Soul -3","Oramond - Undead Dragon",
-"Issavi - Puzzle","Plains of Havoc - Bulltar -1","Plains of Havoc - Bulltar -2",
-"Port Hope - Asura (Palace)","Feyrist - Weakened Frazzlemaw -1","Feyrist - Weakened Frazzlemaw -2",
-"Feyrist - Elfo de Fogo (Castelo)","Svargrond - Elfo de Gelo","Oramond - Glooth Factory",
-"Gray Island - Deathling","Vengoth - Norcferatu Fortress","Vengoth - Norcferatu Dungeon (West)",
-"Vengoth - Norcferatu Dungeon (East)","Warzone - Warzone 7 (andar -1)","Edron - Podzila Rootthings -2",
-"Marapur - Nagas","Oramond - Catacombs Esquerda","Oramond - Catacombs Direita",
-"Thais - MOTA -2","Thais - MOTA -3","Roshamuul - Lower Roshamuul",
-"Oskayaat - Weretiger -1","Oskayaat - Weretiger -2","Oskayaat - Werecrocodile -1",
-"Oskayaat - Werecrocodile -2","Carlin - Energy Library Terreo","Darashia - Caminho Ferumbras -1 (escada)",
-"Issavi - Ogre (cachoeira)","Roshamuul - Prison -1","Roshamuul - Prison -2",
-"Issavi - Sphinx -2","Oramond - Furys","Roshamuul - Shock Head (after bones)",
-"Marapur - Tartaruguinhas","Port Hope - Carnivoras","Venore - POI Ashfalor Seal",
-"Edron - Book World -3","Edron - Book World -1","Edron - Bounac Crypt Warriors",
-"Oramond - Glooth Tower","Roshamuul - Tubaroes","Venore - POI Bazir Seal",
-"Venore - POI Pumin Seal","Venore - POI Tafariel Seal","Venore - POI Infernatil Seal",
-"Venore - POI Verminor Seal","Darashia - Caminho Last Ferumbras","Edron - Raubritter Castelo",
-"Darashia - Werelions -2","Edron - Raubritter Subsolo","Carlin - Energy Library -1",
-"Darashia - Caminho Last Ferumbras n8","Darashia - Ferumbras DT Seal -2","Darashia - Ferumbras Infernatil +1",
-"Darashia - Ferumbras Plague -2","Darashia - Ferumbras Pumin Seal -1 e -2","Edron - Ingol -5",
-"Edron - Ingol Surface Direita","Candia - Chocolate Mines -1 e -2","Darashia - Burster Spectre",
-"Darashia - Deep Desert -3","Darashia - Grim Reaper","Darashia - Werelions -1",
-"Edron - Book World -2","Edron - Orc Cult","Edron - Bounac Usurpers",
-"Edron - Podzila Quaras","Zao - Draken Walls (Norte)","Yalahar - Grim Reaper",
-"Edron - Podzila Rootthings -1","Warzone - Warzone 9","Svargrond - Elf de Gelo (teleport)",
-"Feyrist - Elf de Fogo (Teleport)","Darashia - Caminho Ferumbras (volta completa)"
-];
-
-const state = RESPAWNS.map((name, i) => ({
-  id: i,
-  name: name,
-  favorite: false
-}));
-
+let state = [];
 let showFavOnly = false;
 let searchTerm = "";
 let sortMode = "padrao";
+let favorites = JSON.parse(localStorage.getItem('belobra_favorites') || '[]');
 
-// ===== Motor de fila (localStorage) — compartilhado com a página de detalhe =====
-const QUEUE_PREFIX = "belobra_queue_";
-
-function loadQueue(id){
-  try{
-    const raw = localStorage.getItem(QUEUE_PREFIX + id);
-    return raw ? JSON.parse(raw) : { active: null, waiting: [], calling: null };
-  }catch(e){
-    return { active: null, waiting: [], calling: null };
-  }
+async function boot(){
+  const respawns = await belobraGetRespawns();
+  state = respawns.map(r => ({ id: r.id, name: r.name, favorite: favorites.includes(r.id) }));
+  await render();
+  setInterval(render, 5000);
 }
-function saveQueue(id, q){
-  localStorage.setItem(QUEUE_PREFIX + id, JSON.stringify(q));
-}
-function tickQueue(id){
-  const q = loadQueue(id);
-  const now = Date.now();
-  let changed = false;
 
-  if(q.active){
-    const totalMs = (q.active.durationMin + 15) * 60000;
-    if(now - q.active.startedAt >= totalMs){
-      q.active = null;
-      changed = true;
-    }
-  }
-  if(q.calling && now > q.calling.deadline){
-    q.calling = null;
-    changed = true;
-  }
-  if(!q.active && !q.calling && q.waiting.length > 0){
-    const next = q.waiting.shift();
-    q.calling = { name: next.name, type: next.type, durationMin: next.durationMin, deadline: now + 5*60000 };
-    changed = true;
-  }
-  if(changed) saveQueue(id, q);
-  return q;
-}
-function queueCount(q){ return q.waiting.length + (q.calling ? 1 : 0); }
-function isOcupado(q){ return !!q.active || !!q.calling; }
-// ===============================================================================
-
-function render(){
+async function render(){
   const grid = document.getElementById("grid");
+  const queueMap = await belobraLoadAllQueueStatus();
+
   let items = state.filter(r => {
     if(showFavOnly && !r.favorite) return false;
     if(searchTerm && !r.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     return true;
   }).map(r => {
-    const q = tickQueue(r.id);
-    return { ...r, ocupado: isOcupado(q), queue: queueCount(q) };
+    const q = queueMap[r.id] || { active:false, calling:false, waitingCount:0 };
+    const ocupado = q.active || q.calling;
+    const queueCount = q.waitingCount + (q.calling ? 1 : 0);
+    return { ...r, ocupado, queue: queueCount };
   });
 
   if(sortMode === "az"){
@@ -351,7 +268,7 @@ function render(){
             <h3>${r.name}</h3>
             <span class="status ${isOcupadoR?'ocupado':'livre'}">&#9679; ${isOcupadoR?'OCUPADO':'LIVRE'}</span>
           </div>
-          <div class="queue-label"><span>${r.queue} na fila</span><span>máximo 10</span></div>
+          <div class="queue-label"><span>${r.queue} na fila</span><span>maximo 10</span></div>
           <div class="queue-bar"><div class="queue-fill" style="width:${pct}%"></div></div>
           <div class="card-footer">
             <div class="icon-btn ${r.favorite?'active':''}" onclick="toggleFav(${r.id})">&#9733;</div>
@@ -362,17 +279,24 @@ function render(){
     }).join("");
   }
 
-  const livres = items.length ? state.filter(r => !isOcupado(tickQueue(r.id))).length : state.length;
-  const ocupados = state.length - livres;
+  const totalOcupados = state.filter(r => {
+    const q = queueMap[r.id];
+    return q && (q.active || q.calling);
+  }).length;
+  const livres = state.length - totalOcupados;
   document.getElementById("count-livre").textContent = livres;
-  document.getElementById("count-ocupado").textContent = ocupados;
+  document.getElementById("count-ocupado").textContent = totalOcupados;
 }
-
-setInterval(render, 5000);
 
 function toggleFav(id){
   const r = state.find(x => x.id === id);
   r.favorite = !r.favorite;
+  if(r.favorite){
+    if(!favorites.includes(id)) favorites.push(id);
+  } else {
+    favorites = favorites.filter(f => f !== id);
+  }
+  localStorage.setItem('belobra_favorites', JSON.stringify(favorites));
   render();
 }
 
@@ -392,10 +316,8 @@ document.getElementById("sort").addEventListener("change", (e) => {
   render();
 });
 
-render();
+boot();
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="belobra-app.js"></script>
 </body>
 </html>
