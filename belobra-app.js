@@ -43,6 +43,10 @@ async function belobraRenderUserWidget(){
     const meta = user.user_metadata || {};
     const name = meta.full_name || meta.name || meta.custom_claims?.global_name || 'Jogador';
     const avatarUrl = meta.avatar_url || '';
+    const role = await belobraGetMyRole();
+    const adminLink = (role === 'admin' || role === 'moderator')
+      ? '<a href="belobra-admin-tickets.html" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#e0a94a;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;text-decoration:none;">&#128737;&#65039; Painel de Tickets</a>'
+      : '';
     widget.innerHTML = `
       <div class="belobra-user-menu" style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="belobraToggleUserMenu()">
         ${avatarUrl ? `<img src="${avatarUrl}" style="width:26px;height:26px;border-radius:50%;">` : '<div class="avatar"></div>'}
@@ -50,6 +54,7 @@ async function belobraRenderUserWidget(){
         <div id="belobra-user-dropdown" style="display:none;position:absolute;top:56px;right:24px;background:#12151c;border:1px solid #232733;border-radius:10px;padding:8px;min-width:180px;z-index:20;">
           <a href="belobra-personagem.html" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#eef0f5;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;text-decoration:none;">&#9999;&#65039; Trocar Personagem</a>
           <a href="belobra-suporte.html" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#eef0f5;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;text-decoration:none;">&#128231; Central de Suporte</a>
+          ${adminLink}
           <div style="height:1px;background:#232733;margin:4px 0;"></div>
           <button onclick="belobraSignOut()" style="display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:#e2574c;padding:10px;text-align:left;cursor:pointer;font-size:13px;border-radius:6px;">&#8618; Sair</button>
         </div>
@@ -270,4 +275,109 @@ async function belobraLoadAllQueueStatus(){
     else map[r.respawn_id].waitingCount++;
   });
   return map;
+}
+
+// ============================================================
+// Cargo do usuario (user / moderator / admin)
+// ============================================================
+async function belobraGetMyRole(){
+  const user = await belobraGetUser();
+  if(!user) return 'guest';
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  if(error || !data) return 'user';
+  return data.role;
+}
+
+// ============================================================
+// Upload de anexos de ticket (Supabase Storage)
+// ============================================================
+async function belobraUploadTicketAttachment(file){
+  const user = await belobraGetUser();
+  const ext = file.name.split('.').pop();
+  const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const { error } = await supabaseClient.storage.from('ticket-attachments').upload(path, file);
+  if(error) throw error;
+  const { data } = supabaseClient.storage.from('ticket-attachments').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+// ============================================================
+// Tickets — jogador
+// ============================================================
+async function belobraGetMyTickets(){
+  const user = await belobraGetUser();
+  const { data, error } = await supabaseClient
+    .from('tickets')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('created_at', { ascending: false });
+  if(error) throw error;
+  return data;
+}
+
+async function belobraCreateTicket(category, description, characterId, attachmentUrls){
+  const user = await belobraGetUser();
+  const { data, error } = await supabaseClient
+    .from('tickets')
+    .insert({
+      profile_id: user.id,
+      character_id: characterId || null,
+      category,
+      description,
+      attachments: attachmentUrls || []
+    })
+    .select()
+    .single();
+  if(error) throw error;
+  return data;
+}
+
+// ============================================================
+// Tickets — staff (admin/moderador)
+// ============================================================
+async function belobraGetAllTickets(){
+  const { data, error } = await supabaseClient
+    .from('tickets')
+    .select('*, profiles(discord_username), characters(name, type)')
+    .order('created_at', { ascending: false });
+  if(error) throw error;
+  return data;
+}
+
+async function belobraUpdateTicketStatus(ticketId, status){
+  const { error } = await supabaseClient
+    .from('tickets')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', ticketId);
+  if(error) throw error;
+}
+
+// ============================================================
+// Mensagens dentro de um ticket (conversa)
+// ============================================================
+async function belobraGetTicketMessages(ticketId){
+  const { data, error } = await supabaseClient
+    .from('ticket_messages')
+    .select('*, profiles(discord_username)')
+    .eq('ticket_id', ticketId)
+    .order('created_at', { ascending: true });
+  if(error) throw error;
+  return data;
+}
+
+async function belobraSendTicketMessage(ticketId, message, isStaff){
+  const user = await belobraGetUser();
+  const { error } = await supabaseClient
+    .from('ticket_messages')
+    .insert({
+      ticket_id: ticketId,
+      sender_profile_id: user.id,
+      message,
+      is_staff: !!isStaff
+    });
+  if(error) throw error;
 }

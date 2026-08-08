@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Painel de Tickets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12; --bg-nav:#0e1016; --bg-card:#12151c; --border:#232733;
+    --text-primary:#eef0f5; --text-secondary:#8b8f9c; --text-muted:#5c606c;
+    --accent-gold:#e0a94a; --accent-teal:#2fbf87; --accent-red:#e2574c; --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover{color:var(--text-primary);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:900px;margin:0 auto;padding:40px 24px 100px;}
+  .page-head{margin-bottom:24px;}
+  .page-head h1{font-size:26px;margin-bottom:6px;color:var(--accent-gold);}
+  .page-head p{color:var(--text-secondary);font-size:13px;}
+
+  .filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .filters select{background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:8px;font-size:13px;}
+
+  .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+
+  .ticket-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);cursor:pointer;gap:12px;flex-wrap:wrap;}
+  .ticket-row:last-child{border-bottom:none;}
+  .ticket-row:hover{opacity:0.85;}
+  .ticket-row .cat{font-weight:700;font-size:14px;}
+  .ticket-row .meta{font-size:12px;color:var(--text-muted);margin-top:4px;}
+  .status-chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;}
+  .status-chip.aberto{background:rgba(224,169,74,0.15);color:var(--accent-gold);}
+  .status-chip.em_andamento{background:rgba(91,155,213,0.15);color:#5b9bd5;}
+  .status-chip.respondido{background:rgba(47,191,135,0.15);color:var(--accent-teal);}
+  .status-chip.fechado{background:rgba(139,143,156,0.15);color:var(--text-muted);}
+
+  .empty{padding:40px;text-align:center;color:var(--text-muted);font-size:14px;}
+  .denied{text-align:center;padding:60px 20px;color:var(--text-secondary);}
+  .denied .big{font-size:40px;margin-bottom:14px;}
+
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--accent-teal);text-decoration:none;margin-bottom:16px;cursor:pointer;background:none;border:none;}
+
+  .thread-msg{display:flex;gap:10px;margin-bottom:16px;}
+  .thread-msg .bubble{background:var(--pill-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;}
+  .thread-msg.staff .bubble{background:rgba(47,191,135,0.08);border-color:rgba(47,191,135,0.3);}
+  .thread-msg .who{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700;}
+  .thread-msg.staff .who{color:var(--accent-teal);}
+  .thread-img{max-width:200px;border-radius:8px;margin-top:8px;display:block;cursor:pointer;}
+
+  .status-select-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+  .status-select-row select{background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:8px;font-size:13px;}
+
+  label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;margin-top:14px;}
+  textarea{width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;font-family:inherit;resize:vertical;min-height:90px;}
+  .btn-send{margin-top:14px;width:100%;background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);color:#0b0d12;border:none;padding:13px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;}
+
+  .info-line{font-size:12px;color:var(--text-muted);margin-bottom:4px;}
+  .info-line b{color:var(--text-secondary);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatisticas</a>
+    <a href="https://discord.gg/EWehENtQxP" target="_blank" rel="noopener">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <div id="app-area">Carregando...</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+<script>
+let allTickets = [];
+let filterStatus = 'todos';
+let openTicketId = null;
+let view = 'list';
+
+async function boot(){
+  const user = await belobraGetUser();
+  const area = document.getElementById('app-area');
+
+  if(!user){
+    area.innerHTML = `<div class="panel"><div class="denied"><div class="big">&#128274;</div>Voce precisa estar logado pra acessar esse painel.</div></div>`;
+    return;
+  }
+
+  const role = await belobraGetMyRole();
+  if(role !== 'admin' && role !== 'moderator'){
+    area.innerHTML = `<div class="panel"><div class="denied"><div class="big">&#9940;</div>Acesso restrito a administradores e moderadores.</div></div>`;
+    return;
+  }
+
+  await loadTickets();
+  render();
+}
+
+async function loadTickets(){
+  try{ allTickets = await belobraGetAllTickets(); }
+  catch(e){ allTickets = []; }
+}
+
+function statusLabel(s){
+  return { aberto:'Aberto', em_andamento:'Em andamento', respondido:'Respondido', fechado:'Fechado' }[s] || s;
+}
+function escapeHtmlLocal(str){
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function render(){
+  const area = document.getElementById('app-area');
+
+  if(view === 'thread'){
+    renderThread(area);
+    return;
+  }
+
+  const filtered = filterStatus === 'todos' ? allTickets : allTickets.filter(t => t.status === filterStatus);
+
+  const rows = filtered.map(t => `
+    <div class="ticket-row" onclick="openThread(${t.id})">
+      <div>
+        <div class="cat">${escapeHtmlLocal(t.category)}</div>
+        <div class="meta">
+          ${escapeHtmlLocal(t.profiles?.discord_username || 'Desconhecido')}
+          ${t.characters ? ' &middot; ' + escapeHtmlLocal(t.characters.name) : ''}
+          &middot; ${new Date(t.created_at).toLocaleString('pt-BR')}
+        </div>
+      </div>
+      <span class="status-chip ${t.status}">${statusLabel(t.status)}</span>
+    </div>
+  `).join('');
+
+  area.innerHTML = `
+    <div class="page-head">
+      <h1>Painel de Tickets</h1>
+      <p>Total: ${allTickets.length} tickets</p>
+    </div>
+    <div class="filters">
+      <select onchange="setFilter(this.value)">
+        <option value="todos" ${filterStatus==='todos'?'selected':''}>Todos os status</option>
+        <option value="aberto" ${filterStatus==='aberto'?'selected':''}>Aberto</option>
+        <option value="em_andamento" ${filterStatus==='em_andamento'?'selected':''}>Em andamento</option>
+        <option value="respondido" ${filterStatus==='respondido'?'selected':''}>Respondido</option>
+        <option value="fechado" ${filterStatus==='fechado'?'selected':''}>Fechado</option>
+      </select>
+    </div>
+    <div class="panel">
+      ${filtered.length === 0 ? '<div class="empty">Nenhum ticket encontrado.</div>' : rows}
+    </div>
+  `;
+}
+
+function setFilter(v){
+  filterStatus = v;
+  render();
+}
+
+async function openThread(ticketId){
+  openTicketId = ticketId;
+  view = 'thread';
+  render();
+}
+
+async function renderThread(area){
+  const ticket = allTickets.find(t => t.id === openTicketId);
+  if(!ticket){ view = 'list'; render(); return; }
+
+  area.innerHTML = `<button class="back-link" onclick="backToList()">&#8592; Voltar ao painel</button><div class="panel">Carregando...</div>`;
+
+  let messages = [];
+  try{ messages = await belobraGetTicketMessages(openTicketId); }catch(e){}
+
+  const attachmentsHtml = (ticket.attachments || []).map(url => `<img src="${url}" class="thread-img" onclick="window.open('${url}','_blank')">`).join('');
+
+  const messagesHtml = messages.map(m => `
+    <div class="thread-msg ${m.is_staff ? 'staff' : ''}">
+      <div>
+        <div class="who">${m.is_staff ? 'Administracao' : (m.profiles?.discord_username || 'Jogador')}</div>
+        <div class="bubble">${escapeHtmlLocal(m.message)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  area.innerHTML = `
+    <button class="back-link" onclick="backToList()">&#8592; Voltar ao painel</button>
+    <div class="panel">
+      <div class="status-select-row">
+        <select id="status-select" onchange="changeStatus()">
+          <option value="aberto" ${ticket.status==='aberto'?'selected':''}>Aberto</option>
+          <option value="em_andamento" ${ticket.status==='em_andamento'?'selected':''}>Em andamento</option>
+          <option value="respondido" ${ticket.status==='respondido'?'selected':''}>Respondido</option>
+          <option value="fechado" ${ticket.status==='fechado'?'selected':''}>Fechado</option>
+        </select>
+        <span id="status-saved" style="font-size:12px;color:var(--accent-teal);"></span>
+      </div>
+
+      <div class="info-line"><b>Jogador:</b> ${escapeHtmlLocal(ticket.profiles?.discord_username || 'Desconhecido')}</div>
+      <div class="info-line"><b>Personagem:</b> ${ticket.characters ? escapeHtmlLocal(ticket.characters.name) + ' (' + (ticket.characters.type==='main'?'Principal':'Maker') + ')' : 'Nao informado'}</div>
+      <div class="info-line"><b>Aberto em:</b> ${new Date(ticket.created_at).toLocaleString('pt-BR')}</div>
+
+      <h3 style="margin-top:16px;">${escapeHtmlLocal(ticket.category)}</h3>
+      <div class="thread-msg">
+        <div>
+          <div class="who">${escapeHtmlLocal(ticket.profiles?.discord_username || 'Jogador')}</div>
+          <div class="bubble">${escapeHtmlLocal(ticket.description)}${attachmentsHtml}</div>
+        </div>
+      </div>
+      <div style="margin:20px 0;border-top:1px solid var(--border);"></div>
+      ${messagesHtml || '<div class="empty" style="padding:20px;">Ainda sem respostas.</div>'}
+
+      <label>Responder como administracao</label>
+      <textarea id="reply-text" placeholder="Escreva a resposta pro jogador..."></textarea>
+      <button class="btn-send" onclick="sendStaffReply()">Enviar resposta</button>
+    </div>
+  `;
+}
+
+function backToList(){
+  view = 'list';
+  render();
+}
+
+async function changeStatus(){
+  const newStatus = document.getElementById('status-select').value;
+  await belobraUpdateTicketStatus(openTicketId, newStatus);
+  const ticket = allTickets.find(t => t.id === openTicketId);
+  if(ticket) ticket.status = newStatus;
+  document.getElementById('status-saved').textContent = 'Status atualizado!';
+  setTimeout(() => { const el = document.getElementById('status-saved'); if(el) el.textContent = ''; }, 2000);
+}
+
+async function sendStaffReply(){
+  const text = document.getElementById('reply-text').value.trim();
+  if(!text) return;
+  await belobraSendTicketMessage(openTicketId, text, true);
+
+  // Ao responder, muda o status automaticamente pra "respondido" (se nao estiver fechado)
+  const ticket = allTickets.find(t => t.id === openTicketId);
+  if(ticket && ticket.status !== 'fechado'){
+    await belobraUpdateTicketStatus(openTicketId, 'respondido');
+    ticket.status = 'respondido';
+  }
+
+  await renderThread(document.getElementById('app-area'));
+}
+
+boot();
+</script>
+
+</body>
+</html>

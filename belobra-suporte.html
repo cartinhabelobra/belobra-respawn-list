@@ -34,29 +34,33 @@
   .page-head p{color:var(--text-secondary);font-size:14px;max-width:460px;margin:0 auto;line-height:1.6;}
 
   .action-row{display:flex;justify-content:center;gap:12px;margin:26px 0;flex-wrap:wrap;}
-  .action-row button{
-    padding:12px 22px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;border:none;
-  }
+  .action-row button{padding:12px 22px;border-radius:20px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
   .action-row .primary{background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);color:#0b0d12;}
   .action-row .secondary{background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);}
 
   .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;margin-bottom:20px;}
   .panel h3{font-size:15px;margin-bottom:16px;}
   label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;margin-top:14px;}
-  select, textarea, input{
-    width:100%;background:var(--pill-bg);border:1px solid var(--border);
-    color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;font-family:inherit;
-  }
+  select, textarea, input{width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;font-family:inherit;}
   textarea{resize:vertical;min-height:110px;}
   .char-count{font-size:11px;color:var(--text-muted);text-align:right;margin-top:4px;}
-  .file-drop{border:1px dashed var(--border);border-radius:10px;padding:20px;text-align:center;margin-top:14px;font-size:13px;color:var(--text-secondary);}
-  .btn-send{margin-top:20px;width:100%;background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);color:#0b0d12;border:none;padding:13px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;}
 
-  .ticket-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);}
+  .file-drop{border:1px dashed var(--border);border-radius:10px;padding:16px;text-align:center;margin-top:14px;font-size:13px;color:var(--text-secondary);cursor:pointer;}
+  .file-drop:hover{border-color:var(--accent-teal);}
+  .preview-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .preview-item{position:relative;width:64px;height:64px;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+  .preview-item img{width:100%;height:100%;object-fit:cover;}
+  .preview-item .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;}
+
+  .btn-send{margin-top:20px;width:100%;background:linear-gradient(90deg,var(--accent-teal),#8b7ee0);color:#0b0d12;border:none;padding:13px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;}
+  .btn-send:disabled{opacity:0.6;cursor:not-allowed;}
+
+  .ticket-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);cursor:pointer;}
   .ticket-row:last-child{border-bottom:none;}
+  .ticket-row:hover{opacity:0.85;}
   .ticket-row .cat{font-weight:700;font-size:14px;}
   .ticket-row .date{font-size:12px;color:var(--text-muted);}
-  .status-chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;}
+  .status-chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;}
   .status-chip.aberto{background:rgba(224,169,74,0.15);color:var(--accent-gold);}
   .status-chip.em_andamento{background:rgba(91,155,213,0.15);color:#5b9bd5;}
   .status-chip.respondido{background:rgba(47,191,135,0.15);color:var(--accent-teal);}
@@ -65,7 +69,18 @@
   .empty{padding:40px;text-align:center;color:var(--text-muted);font-size:14px;}
   .login-wall{text-align:center;padding:40px;color:var(--text-secondary);font-size:14px;}
   .login-wall button{margin-top:16px;background:#5865F2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:700;cursor:pointer;}
-  .hidden{display:none;}
+
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--accent-teal);text-decoration:none;margin-bottom:16px;cursor:pointer;background:none;border:none;}
+
+  .thread-msg{display:flex;gap:10px;margin-bottom:16px;}
+  .thread-msg .bubble{background:var(--pill-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;max-width:100%;}
+  .thread-msg.staff .bubble{background:rgba(47,191,135,0.08);border-color:rgba(47,191,135,0.3);}
+  .thread-msg .who{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:700;}
+  .thread-msg.staff .who{color:var(--accent-teal);}
+  .thread-img{max-width:180px;border-radius:8px;margin-top:8px;display:block;cursor:pointer;}
+
+  .reply-box{margin-top:20px;}
+  .status-select-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -95,9 +110,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="belobra-app.js"></script>
 <script>
-let view = 'list'; // 'list' ou 'new'
+let view = 'list';
 let myTickets = [];
 let myCharacters = [];
+let selectedFiles = [];
+let openTicketId = null;
 
 async function boot(){
   const user = await belobraGetUser();
@@ -121,17 +138,26 @@ async function boot(){
 }
 
 async function loadTickets(){
-  const user = await belobraGetUser();
-  const { data, error } = await supabaseClient
-    .from('tickets')
-    .select('*')
-    .eq('profile_id', user.id)
-    .order('created_at', { ascending: false });
-  myTickets = error ? [] : data;
+  try{ myTickets = await belobraGetMyTickets(); }
+  catch(e){ myTickets = []; }
+}
+
+function statusLabel(s){
+  return { aberto:'Aberto', em_andamento:'Em andamento', respondido:'Respondido', fechado:'Fechado' }[s] || s;
+}
+function escapeHtmlLocal(str){
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
 }
 
 function render(){
   const area = document.getElementById('app-area');
+
+  if(view === 'thread'){
+    renderThread(area);
+    return;
+  }
 
   const actionRow = `
     <div class="action-row">
@@ -141,13 +167,13 @@ function render(){
   `;
 
   if(view === 'new'){
-    const charOptions = myCharacters.map(c => `<option value="${c.id}">${c.name} (${c.type==='main'?'Principal':'Maker'})</option>`).join('');
+    const charOptions = myCharacters.map(c => `<option value="${c.id}">${escapeHtmlLocal(c.name)} (${c.type==='main'?'Principal':'Maker'})</option>`).join('');
     area.innerHTML = actionRow + `
       <div class="panel">
         <h3>Abrir novo ticket</h3>
         <label>Personagem afetado</label>
         <select id="ticket-char">
-          <option value="">-- Escolha o personagem --</option>
+          <option value="">-- Escolha o personagem (opcional) --</option>
           ${charOptions}
         </select>
 
@@ -166,15 +192,20 @@ function render(){
         <textarea id="ticket-desc" maxlength="2000" oninput="updateTicketCount()" placeholder="Explique o que aconteceu com o maximo de detalhes..."></textarea>
         <div class="char-count" id="ticket-count">0/2000</div>
 
-        <div class="file-drop">Anexar provas (imagens/videos) &mdash; em breve. Por enquanto, descreva o ocorrido com detalhes no texto.</div>
+        <label>Anexar provas (imagens)</label>
+        <div class="file-drop" onclick="document.getElementById('file-input').click()">
+          Clique aqui pra escolher imagens (max 5 arquivos, 5MB cada)
+        </div>
+        <input type="file" id="file-input" accept="image/*" multiple style="display:none;" onchange="handleFiles(event)">
+        <div class="preview-row" id="preview-row"></div>
 
-        <button class="btn-send" onclick="sendTicket()">Enviar Ticket</button>
+        <button class="btn-send" id="send-btn" onclick="sendTicket()">Enviar Ticket</button>
         <div class="char-count" id="ticket-status" style="text-align:left;margin-top:10px;"></div>
       </div>
     `;
   } else {
     const rows = myTickets.map(t => `
-      <div class="ticket-row">
+      <div class="ticket-row" onclick="openThread(${t.id})">
         <div>
           <div class="cat">${escapeHtmlLocal(t.category)}</div>
           <div class="date">${new Date(t.created_at).toLocaleString('pt-BR')}</div>
@@ -192,17 +223,9 @@ function render(){
   }
 }
 
-function statusLabel(s){
-  return { aberto:'Aberto', em_andamento:'Em andamento', respondido:'Respondido', fechado:'Fechado' }[s] || s;
-}
-function escapeHtmlLocal(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
 function setView(v){
   view = v;
+  selectedFiles = [];
   render();
 }
 
@@ -211,31 +234,119 @@ function updateTicketCount(){
   document.getElementById('ticket-count').textContent = val.length + '/2000';
 }
 
+function handleFiles(event){
+  const files = Array.from(event.target.files || []);
+  for(const f of files){
+    if(selectedFiles.length >= 5) break;
+    if(f.size > 5 * 1024 * 1024) continue;
+    selectedFiles.push(f);
+  }
+  renderPreviews();
+}
+
+function renderPreviews(){
+  const row = document.getElementById('preview-row');
+  row.innerHTML = selectedFiles.map((f, i) => `
+    <div class="preview-item">
+      <img src="${URL.createObjectURL(f)}">
+      <button class="rm" onclick="removeFile(${i})">&times;</button>
+    </div>
+  `).join('');
+}
+function removeFile(i){
+  selectedFiles.splice(i, 1);
+  renderPreviews();
+}
+
 async function sendTicket(){
-  const user = await belobraGetUser();
   const charId = document.getElementById('ticket-char').value || null;
   const category = document.getElementById('ticket-cat').value;
   const description = document.getElementById('ticket-desc').value.trim();
   const statusEl = document.getElementById('ticket-status');
+  const sendBtn = document.getElementById('send-btn');
 
   if(!description){
     statusEl.textContent = 'Escreva uma descricao antes de enviar.';
     return;
   }
 
-  const { error } = await supabaseClient.from('tickets').insert({
-    profile_id: user.id,
-    character_id: charId,
-    category,
-    description
-  });
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Enviando...';
+  statusEl.textContent = '';
 
-  if(error){
-    statusEl.textContent = 'Erro ao enviar: ' + error.message;
-  } else {
+  try{
+    const urls = [];
+    for(const file of selectedFiles){
+      const url = await belobraUploadTicketAttachment(file);
+      urls.push(url);
+    }
+    await belobraCreateTicket(category, description, charId, urls);
     await loadTickets();
     setView('list');
+  }catch(e){
+    statusEl.textContent = 'Erro ao enviar: ' + e.message;
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Enviar Ticket';
   }
+}
+
+async function openThread(ticketId){
+  openTicketId = ticketId;
+  view = 'thread';
+  render();
+}
+
+async function renderThread(area){
+  const ticket = myTickets.find(t => t.id === openTicketId);
+  if(!ticket){ setView('list'); return; }
+
+  area.innerHTML = `<button class="back-link" onclick="setView('list')">&#8592; Voltar aos meus tickets</button><div class="panel">Carregando...</div>`;
+
+  let messages = [];
+  try{ messages = await belobraGetTicketMessages(openTicketId); }catch(e){}
+
+  const attachmentsHtml = (ticket.attachments || []).map(url => `<img src="${url}" class="thread-img" onclick="window.open('${url}','_blank')">`).join('');
+
+  const messagesHtml = messages.map(m => `
+    <div class="thread-msg ${m.is_staff ? 'staff' : ''}">
+      <div>
+        <div class="who">${m.is_staff ? 'Administracao' : (m.profiles?.discord_username || 'Voce')}</div>
+        <div class="bubble">${escapeHtmlLocal(m.message)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  area.innerHTML = `
+    <button class="back-link" onclick="setView('list')">&#8592; Voltar aos meus tickets</button>
+    <div class="panel">
+      <div class="status-select-row">
+        <span class="status-chip ${ticket.status}">${statusLabel(ticket.status)}</span>
+        <span style="color:var(--text-muted);font-size:12px;">Aberto em ${new Date(ticket.created_at).toLocaleString('pt-BR')}</span>
+      </div>
+      <h3>${escapeHtmlLocal(ticket.category)}</h3>
+      <div class="thread-msg">
+        <div>
+          <div class="who">Voce</div>
+          <div class="bubble">${escapeHtmlLocal(ticket.description)}${attachmentsHtml}</div>
+        </div>
+      </div>
+      <div style="margin:20px 0;border-top:1px solid var(--border);"></div>
+      ${messagesHtml || '<div class="empty" style="padding:20px;">Ainda sem respostas.</div>'}
+
+      <div class="reply-box">
+        <label>Responder</label>
+        <textarea id="reply-text" placeholder="Escreva sua mensagem..."></textarea>
+        <button class="btn-send" onclick="sendReply()">Enviar mensagem</button>
+      </div>
+    </div>
+  `;
+}
+
+async function sendReply(){
+  const text = document.getElementById('reply-text').value.trim();
+  if(!text) return;
+  await belobraSendTicketMessage(openTicketId, text, false);
+  await renderThread(document.getElementById('app-area'));
 }
 
 boot();
