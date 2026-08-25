@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Sistema de Tickets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  article h2{font-size:18px;color:var(--accent-teal);margin:32px 0 12px;}
+  article p{font-size:15px;line-height:1.75;color:var(--text-primary);margin-bottom:14px;}
+
+  ul.feature-list{list-style:none;margin:12px 0;}
+  ul.feature-list li{font-size:14px;color:var(--text-primary);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--border);}
+  ul.feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);font-weight:700;}
+  ul.feature-list li:last-child{border-bottom:none;}
+  ul.feature-list li b{color:var(--text-primary);}
+
+  ol.steps{margin:16px 0;padding-left:0;list-style:none;counter-reset:step;}
+  ol.steps li{
+    counter-increment:step;
+    display:flex;gap:12px;
+    font-size:14px;color:var(--text-primary);
+    padding:10px 0;
+    border-bottom:1px solid var(--border);
+  }
+  ol.steps li:last-child{border-bottom:none;}
+  ol.steps li::before{
+    content:counter(step);
+    background:var(--pill-bg);
+    color:var(--accent-teal);
+    font-weight:700;
+    width:22px;height:22px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;
+    flex-shrink:0;
+  }
+
+  .status-row{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;}
+  .status-chip{
+    flex:1;min-width:140px;
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+  }
+  .status-chip .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px;}
+  .status-chip.open .dot{background:var(--accent-gold);}
+  .status-chip.progress .dot{background:#5b9bd5;}
+  .status-chip.answered .dot{background:var(--accent-teal);}
+  .status-chip.closed .dot{background:var(--text-muted);}
+  .status-chip strong{font-size:13px;}
+  .status-chip p{font-size:12px;color:var(--text-secondary);margin:6px 0 0;}
+
+  .tip-box{background:rgba(224,169,74,0.08);border:1px solid rgba(224,169,74,0.3);border-radius:10px;padding:16px 18px;font-size:14px;color:var(--text-primary);margin:18px 0;}
+  .tip-box b{color:var(--accent-gold);}
+
+  .cta{margin-top:32px;padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{display:inline-block;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="https://discord.gg/EWehENtQxP" target="_blank" rel="noopener">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Abrindo e acompanhando um ticket de suporte</h1>
+    <p class="lead">Como pedir ajuda formalmente pela plataforma, o que esperar de cada etapa do atendimento e como acompanhar a resolucao do seu problema.</p>
+    <div class="meta-line"><span>Publicado em 05/04/2026</span><span>Atualizado em 22/04/2026</span></div>
+
+    <h2>O que e o sistema de tickets</h2>
+    <p>O sistema de tickets e o canal oficial de suporte da Cartinha Online. Por ele, você pode reportar problemas, pedir ajustes no seu cadastro, contestar uma punição ou falar direto com a administracao — tudo de forma organizada e com historico registrado.</p>
+
+    <h2>Quando abrir um ticket</h2>
+    <ul class="feature-list">
+      <li><b>Problema no cadastro:</b> nome errado, personagem duplicado, algum ajuste necessário</li>
+      <li><b>Serviceiros:</b> quando um serviceiro precisa usar o mesmo personagem do dono da conta</li>
+      <li><b>Revisão de banimento:</b> pra contestar uma punição que você considera injusta</li>
+      <li><b>Bugs e erros:</b> pra reportar algum problema tecnico no sistema</li>
+      <li><b>Denuncias:</b> pra relatar comportamento inadequado de outro jogador</li>
+      <li><b>Sugestoes:</b> pra mandar ideias de melhoria pra plataforma</li>
+    </ul>
+
+    <h2>Como abrir um ticket</h2>
+    <ol class="steps">
+      <li>Va no menu de usuário e clique em "Central de Suporte"</li>
+      <li>Selecione o personagem relacionado ao assunto</li>
+      <li>Escolha a categoria do ticket</li>
+      <li>Descreva o problema ou pedido com o máximo de detalhe</li>
+      <li>Anexe provas se precisar (imagens, no máximo 5 arquivos de até 5MB cada)</li>
+      <li>Clique em "Enviar Ticket"</li>
+    </ol>
+
+    <h2>Acompanhando o andamento</h2>
+    <p>Depois de enviar, da pra acompanhar tudo em "Meus Tickets", clicando no ticket pra ver a conversa completa. Os status possiveis são:</p>
+    <div class="status-row">
+      <div class="status-chip open"><strong><span class="dot"></span>Aberto</strong><p>Recebido, aguardando análise</p></div>
+      <div class="status-chip progress"><strong><span class="dot"></span>Verificando</strong><p>A administracao já respondeu e está analisando</p></div>
+      <div class="status-chip answered"><strong><span class="dot"></span>Finalizado</strong><p>Caso encerrado — nao da mais pra responder</p></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-secondary);">Assim que a administracao responde pela primeira vez, o status muda sozinho pra "Verificando". Quando o ticket e marcado como "Finalizado", o campo de resposta some — se precisar de algo mais, e so abrir um ticket novo.</p>
+
+    <div class="tip-box"><b>Dica:</b> quanto mais detalhado o ticket, mais rapido a administracao consegue resolver. Vale incluir nome de personagem, data, horário e qualquer evidencia que tiver.</div>
+
+    <h2>Regras específicas pra denúncias</h2>
+    <p>Se você está abrindo um ticket de categoria "Denúncia de Jogador", duas regras extras se aplicam:</p>
+    <ul class="feature-list">
+      <li>Você só consegue denunciar quem está caçando num respawn onde você mesmo está <b>na fila esperando vaga</b> naquele momento</li>
+      <li>Não da pra abrir uma segunda denúncia contra a mesma pessoa enquanto a primeira ainda estiver em aberto — espere ela ser finalizada</li>
+    </ul>
+    <p>Isso existe pra evitar denúncias em massa vindas de fora do contexto real da hunt.</p>
+
+    <h2>Tickets antigos somem sozinhos</h2>
+    <p>Pra manter tudo organizado, tickets marcados como "Finalizado" há mais de 30 dias são apagados automaticamente pelo sistema. A administração também pode excluir um ticket manualmente a qualquer momento, se achar necessário.</p>
+
+    <h2>Como fazer um ticket render mais rapido</h2>
+    <ul class="feature-list">
+      <li>Seja claro e direto na descricao</li>
+      <li>Sempre que der, anexe uma prova visual</li>
+      <li>Informe data e horário do que aconteceu</li>
+      <li>Mantenha um tom respeitoso — ticket agressivo só atrasa a resolucao</li>
+      <li>Evite abrir varios tickets sobre o mesmo assunto</li>
+    </ul>
+
+    <div class="cta">
+      <p>Precisa de ajuda com algo específico?</p>
+      <a href="belobra-respawn-list.html">Voltar para o site</a>
+    </div>
+  </article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+</body>
+</html>

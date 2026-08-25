@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Banimentos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12; --bg-nav:#0e1016; --bg-card:#12151c; --border:#232733;
+    --text-primary:#eef0f5; --text-secondary:#8b8f9c; --text-muted:#5c606c;
+    --accent-gold:#e0a94a; --accent-teal:#2fbf87; --accent-red:#e2574c; --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover{color:var(--text-primary);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:900px;margin:0 auto;padding:40px 24px 100px;}
+  .page-head{margin-bottom:24px;}
+  .page-head h1{font-size:26px;margin-bottom:6px;color:var(--accent-red);}
+  .page-head p{color:var(--text-secondary);font-size:13px;}
+
+  .panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+
+  .search-row{display:flex;gap:10px;margin-bottom:16px;}
+  .search-row input{flex:1;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 14px;border-radius:8px;font-size:13px;}
+  .search-row button{background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 16px;border-radius:8px;font-size:13px;cursor:pointer;}
+
+  .ban-row{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);gap:14px;flex-wrap:wrap;}
+  .ban-row:last-child{border-bottom:none;}
+  .ban-row .who{display:flex;align-items:center;gap:10px;}
+  .ban-row .who img{width:34px;height:34px;border-radius:50%;}
+  .ban-row .name{font-weight:700;font-size:14px;}
+  .ban-row .meta{font-size:12px;color:var(--text-muted);margin-top:3px;}
+  .ban-row .reason{font-size:12px;color:var(--text-secondary);margin-top:3px;font-style:italic;}
+
+  .stage-chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;}
+  .stage-chip.s1{background:rgba(224,169,74,0.15);color:var(--accent-gold);}
+  .stage-chip.s2{background:rgba(224,169,74,0.25);color:var(--accent-gold);}
+  .stage-chip.s3{background:rgba(226,87,76,0.2);color:#e2716c;}
+  .stage-chip.s4{background:rgba(226,87,76,0.3);color:var(--accent-red);}
+  .stage-chip.inactive{background:rgba(139,143,156,0.15);color:var(--text-muted);}
+
+  .btn-unban{background:var(--pill-bg);border:1px solid var(--accent-teal);color:var(--accent-teal);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;}
+
+  .empty{padding:40px;text-align:center;color:var(--text-muted);font-size:14px;}
+  .denied{text-align:center;padding:60px 20px;color:var(--text-secondary);}
+  .denied .big{font-size:40px;margin-bottom:14px;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:380px;}
+  .modal-box h3{font-size:16px;margin-bottom:14px;}
+  .modal-box label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:8px;}
+  .stage-options{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+  .stage-options label{
+    display:flex;align-items:center;gap:10px;background:var(--pill-bg);border:1px solid var(--border);
+    border-radius:8px;padding:10px 12px;cursor:pointer;font-size:13px;color:var(--text-primary);
+  }
+  .stage-options input{margin:0;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .modal-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
+  .modal-actions .cancel{background:var(--pill-bg);color:var(--text-primary);border:1px solid var(--border);}
+  .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-teal),var(--accent-gold));color:#0b0d12;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatisticas</a>
+    <a href="#" target="_blank" rel="noopener">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <div id="app-area">Carregando...</div>
+</main>
+
+<div class="modal-overlay" id="unban-modal">
+  <div class="modal-box">
+    <h3>Desbanir conta</h3>
+    <label>Em qual estagio deixar essa conta? (define a proxima punicao se ela for banida de novo)</label>
+    <div class="stage-options" id="stage-options"></div>
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeUnbanModal()">Cancelar</button>
+      <button class="confirm" onclick="confirmUnban()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+<script>
+let bannedProfiles = [];
+let unbanTargetId = null;
+
+async function boot(){
+  const area = document.getElementById('app-area');
+  const user = await belobraGetUser();
+
+  if(!user){
+    area.innerHTML = `<div class="panel"><div class="denied"><div class="big">&#128274;</div>Voce precisa estar logado.</div></div>`;
+    return;
+  }
+
+  const role = await belobraGetMyRole();
+  if(role !== 'admin'){
+    area.innerHTML = `<div class="panel"><div class="denied"><div class="big">&#128683;</div>Essa pagina e restrita ao administrador do servidor.</div></div>`;
+    return;
+  }
+
+  await loadBans();
+  render();
+}
+
+async function loadBans(){
+  bannedProfiles = await belobraGetBannedProfiles();
+}
+
+function stageLabel(stage){
+  return { 1: '1a vez - 1 dia', 2: '2a vez - 7 dias', 3: '3a vez - 30 dias', 4: 'Permanente' }[stage] || 'Sem banimento';
+}
+
+function render(){
+  const area = document.getElementById('app-area');
+  const now = Date.now();
+
+  const rows = bannedProfiles.map(p => {
+    const isActive = p.ban_stage === 4 || (p.banned_until && new Date(p.banned_until).getTime() > now);
+    const stageClass = p.ban_stage === 4 ? 's4' : (p.ban_stage === 3 ? 's3' : (p.ban_stage === 2 ? 's2' : 's1'));
+    const statusText = p.ban_stage === 4
+      ? 'Banimento permanente'
+      : (isActive ? `Banido ate ${new Date(p.banned_until).toLocaleString('pt-BR')}` : 'Nao esta banido no momento');
+
+    return `
+      <div class="ban-row">
+        <div class="who">
+          ${p.discord_avatar_url ? `<img src="${p.discord_avatar_url}">` : '<div class="avatar"></div>'}
+          <div>
+            <div class="name">${escapeHtmlLocal(p.discord_username || 'Desconhecido')}</div>
+            <div class="meta">${statusText}</div>
+            ${p.ban_reason ? `<div class="reason">"${escapeHtmlLocal(p.ban_reason)}"</div>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="stage-chip ${isActive ? stageClass : 'inactive'}">${stageLabel(p.ban_stage)}</span>
+          ${isActive ? `<button class="btn-unban" onclick="openUnbanModal('${p.id}', ${p.ban_stage})">Desbanir</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  area.innerHTML = `
+    <div class="page-head">
+      <h1>&#128683; Banimentos</h1>
+      <p>Contas que ja receberam algum tipo de punicao no sistema. Banimentos novos sao aplicados a partir de um ticket de denuncia.</p>
+    </div>
+    <div class="panel">
+      ${bannedProfiles.length === 0 ? '<div class="empty">Nenhuma conta banida ate agora.</div>' : rows}
+    </div>
+  `;
+}
+
+function escapeHtmlLocal(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function openUnbanModal(profileId, currentStage){
+  unbanTargetId = profileId;
+  const options = document.getElementById('stage-options');
+  const stages = [1,2,3,4];
+  options.innerHTML = stages.map(s => `
+    <label>
+      <input type="radio" name="unban-stage" value="${s}" ${s === currentStage ? 'checked' : ''}>
+      ${stageLabel(s)}
+    </label>
+  `).join('');
+  document.getElementById('unban-modal').classList.add('show');
+}
+
+function closeUnbanModal(){
+  document.getElementById('unban-modal').classList.remove('show');
+  unbanTargetId = null;
+}
+
+async function confirmUnban(){
+  const selected = document.querySelector('input[name="unban-stage"]:checked');
+  if(!selected) return;
+  const stage = parseInt(selected.value, 10);
+  try{
+    await belobraUnbanProfile(unbanTargetId, stage);
+    closeUnbanModal();
+    await loadBans();
+    render();
+  }catch(e){
+    alert('Erro ao desbanir: ' + e.message);
+  }
+}
+
+boot();
+</script>
+
+</body>
+</html>

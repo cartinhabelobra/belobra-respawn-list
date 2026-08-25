@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Melhores Respawns por Faixa de Nivel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  article h2{font-size:18px;color:var(--accent-teal);margin:32px 0 12px;}
+  article p{font-size:15px;line-height:1.75;color:var(--text-primary);margin-bottom:14px;}
+
+  ul.feature-list{list-style:none;margin:12px 0;}
+  ul.feature-list li{font-size:14px;color:var(--text-primary);padding:8px 0 8px 26px;position:relative;border-bottom:1px solid var(--border);}
+  ul.feature-list li::before{content:"\2713";position:absolute;left:0;color:var(--accent-teal);font-weight:700;}
+  ul.feature-list li:last-child{border-bottom:none;}
+  ul.feature-list li b{color:var(--text-primary);}
+
+  .lvl-block{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    margin:16px 0;
+  }
+  .lvl-tag{
+    display:inline-block;
+    font-size:12px;font-weight:700;
+    padding:4px 12px;border-radius:6px;
+    background:var(--pill-bg);color:var(--accent-gold);
+    margin-bottom:10px;
+  }
+
+  .tip-box{background:rgba(224,169,74,0.08);border:1px solid rgba(224,169,74,0.3);border-radius:10px;padding:16px 18px;font-size:14px;color:var(--text-primary);margin:18px 0;}
+  .tip-box b{color:var(--accent-gold);}
+
+  .cta{margin-top:32px;padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{display:inline-block;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="https://discord.gg/EWehENtQxP" target="_blank" rel="noopener">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Melhores respawns por faixa de nivel</h1>
+    <p class="lead">Sugestoes de locais de caça organizados por nivel de personagem, com dicas de eficiencia e como usar a Cartinha Online pra encontrar o respawn certo pra você.</p>
+    <div class="meta-line"><span>Publicado em 08/04/2026</span><span>Atualizado em 24/04/2026</span></div>
+
+    <h2>Organizando a hunt pelo seu nivel</h2>
+    <p>Cada faixa de nivel no Belobra tem respawns que rendem mais experiência e lucro por hora. A Cartinha Online organiza tudo isso pra você, mostrando a disponibilidade em tempo real e ajudando a planejar a caçada sem perder tempo.</p>
+
+    <h2>Alguns principios que valem pra qualquer nivel</h2>
+    <ul class="feature-list">
+      <li><b>Gasto x lucro:</b> respawns mais dificeis costumam render mais experiência, mas também gastam mais suprimento — equilibre conforme seu bolso</li>
+      <li><b>Tempo de refill:</b> use bem os 15 minutos extras que o sistema da — refill eficiente e parte da estratégia</li>
+      <li><b>Horário:</b> respawns populares pro seu nivel podem estar cheios em horário de pico — vale considerar alternativas ou outro horário</li>
+      <li><b>Equipamento:</b> tenha tudo que precisa antes de entrar na fila — o prazo pra confirmar a vaga e de só 5 minutos</li>
+    </ul>
+
+    <div class="lvl-block">
+      <div class="lvl-tag">Niveis baixos (1-100)</div>
+      <p>Nessa faixa, a maioria dos respawns costuma ter pouca gente, já que jogadores de nivel mais alto não usam esses locais. E um ótimo momento pra ir se acostumando com o sistema de filas com calma, sem pressa.</p>
+    </div>
+
+    <div class="lvl-block">
+      <div class="lvl-tag">Niveis médios (100-250)</div>
+      <p>Aqui a concorrencia comeca a aumentar. Vale ter 2 ou 3 respawns alternativos de cabeca, pra não ficar esperando demais. Dar uma olhada na lista antes de logar já ajuda bastante a planejar a sessão.</p>
+    </div>
+
+    <div class="lvl-block">
+      <div class="lvl-tag">Niveis altos (250-500)</div>
+      <p>A faixa mais disputada do servidor. Os respawns de maior experiência costumam ter fila quase o tempo todo, principalmente a noite. Algumas estratégias que ajudam:</p>
+      <ul class="feature-list">
+        <li>Planeje a hunt com antecedencia usando a lista de respawns</li>
+        <li>Entre na fila assim que puder, mesmo sabendo que vai demorar</li>
+        <li>Considere horários alternativos — manha ou madrugada</li>
+        <li>Mantenha o equipamento em dia pra render bem assim que sua vez chegar</li>
+      </ul>
+    </div>
+
+    <div class="lvl-block">
+      <div class="lvl-tag">Endgame (500+)</div>
+      <p>No endgame, os respawns são poucos e extremamente concorridos. Organização deixa de ser opcional e vira essencial. Vale usar tudo que a Cartinha Online oferece: avisos, previsao de horário e planejamento de fila.</p>
+    </div>
+
+    <div class="tip-box"><b>Dica:</b> no endgame, combinar horários com sua Party faz toda diferença. Alinhar tudo com o grupo — respawn e horário — evita perda de tempo e maximiza o rendimento de todo mundo.</div>
+
+    <h2>Tire o máximo proveito da plataforma</h2>
+    <p>Não importa o nivel do seu personagem: a Cartinha Online sempre oferece as mesmas vantagens — transparencia total sobre quem está em cada respawn, previsao de quando sua vez vai chegar, e avisos automaticos pra você não perder a vaga. Use essas ferramentas pra transformar seu tempo de jogo em progresso de verdade.</p>
+
+    <div class="cta">
+      <p>Encontre agora o respawn ideal pro seu nivel.</p>
+      <a href="belobra-respawn-list.html">Ver lista de respawns</a>
+    </div>
+  </article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+</body>
+</html>

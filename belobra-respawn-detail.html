@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - Fila do Respawn</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --accent-red:#e2574c;
+    --accent-blue:#5b9bd5;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover{color:var(--text-primary);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:1100px;margin:0 auto;padding:28px 24px 90px;}
+
+  .back-btn{
+    display:block;width:100%;text-align:center;
+    background:var(--bg-card);border:1px solid var(--border);border-radius:12px;
+    padding:14px;color:var(--text-secondary);text-decoration:none;
+    font-size:13px;font-weight:600;letter-spacing:0.5px;margin-bottom:24px;
+  }
+  .back-btn:hover{border-color:var(--accent-teal);color:var(--text-primary);}
+
+  .rp-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
+  .rp-head h1{font-size:26px;color:var(--accent-teal);margin-bottom:4px;}
+  .rp-head .desc{color:var(--text-muted);font-size:13px;}
+  .rp-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:700;letter-spacing:0.5px;
+    padding:8px 14px;border-radius:20px;
+  }
+  .status-pill.livre{background:rgba(47,191,135,0.15);color:var(--accent-teal);}
+  .status-pill.ocupado{background:rgba(226,87,76,0.15);color:var(--accent-red);}
+  .btn-join{
+    background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));
+    color:#0b0d12;border:none;
+    padding:12px 22px;border-radius:20px;
+    font-weight:800;font-size:13px;cursor:pointer;
+  }
+  .btn-join:disabled{opacity:0.5;cursor:not-allowed;}
+  .btn-join.discord{background:#5865F2;color:#fff;}
+
+  .queue-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .queue-panel-head{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border);font-weight:700;font-size:15px;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{text-align:left;font-size:11px;color:var(--text-secondary);letter-spacing:0.5px;padding:14px 22px;border-bottom:1px solid var(--border);}
+  tbody td{padding:16px 22px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  .pos-badge{width:30px;height:30px;border-radius:50%;background:var(--pill-bg);color:var(--accent-teal);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;}
+  .player-name{font-weight:700;}
+  .player-tag{display:block;font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:0.3px;padding:5px 10px;border-radius:20px;}
+  .chip.cacando{background:rgba(226,87,76,0.15);color:var(--accent-red);}
+  .chip.fila{background:rgba(91,155,213,0.15);color:var(--accent-blue);}
+  .chip.aguardando{background:rgba(224,169,74,0.18);color:var(--accent-gold);}
+  .timer-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;background:var(--pill-bg);color:var(--text-primary);padding:5px 10px;border-radius:10px;margin-left:6px;font-family:'Consolas',monospace;}
+  .countdown{color:var(--accent-gold);}
+  .previsto{color:var(--accent-blue);font-weight:700;}
+  .muted{color:var(--text-muted);}
+  .row-actions{display:flex;gap:8px;}
+  .btn-mini{font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--pill-bg);color:var(--text-primary);cursor:pointer;}
+  .btn-mini.end{color:var(--accent-red);border-color:rgba(226,87,76,0.4);}
+  .btn-mini.accept{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;border:none;}
+  .btn-mini.cancel{color:var(--text-muted);}
+
+  .empty-queue{padding:40px;text-align:center;color:var(--text-muted);font-size:14px;}
+
+  .siren-banner{display:none;align-items:center;gap:12px;background:rgba(224,169,74,0.1);border:1px solid rgba(224,169,74,0.4);border-radius:12px;padding:14px 20px;margin-bottom:18px;font-size:14px;}
+  .siren-banner.afk-alert{background:rgba(226,87,76,0.12);border-color:rgba(226,87,76,0.5);}
+  .btn-mini.report-afk{color:var(--accent-gold);border-color:rgba(224,169,74,0.4);}
+  .btn-mini.confirm-presence{background:var(--accent-red);color:#fff;border:none;animation:pulse-afk 1.2s infinite;}
+  @keyframes pulse-afk{0%,100%{opacity:1;}50%{opacity:0.6;}}
+  .siren-banner.show{display:flex;}
+  .siren-banner .ico{font-size:20px;animation:ring 1s infinite;}
+  @keyframes ring{0%,100%{transform:rotate(0);}20%{transform:rotate(-15deg);}40%{transform:rotate(15deg);}60%{transform:rotate(-10deg);}80%{transform:rotate(10deg);}}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);align-items:center;justify-content:center;z-index:50;padding:20px;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:26px;width:100%;max-width:400px;}
+  .modal-box h3{font-size:16px;margin-bottom:16px;}
+  .modal-box label{font-size:12px;color:var(--text-secondary);display:block;margin-bottom:6px;margin-top:14px;}
+  .modal-box select{width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:10px 12px;border-radius:8px;font-size:14px;}
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .modal-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
+  .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;}
+  .modal-actions .cancel{background:var(--pill-bg);color:var(--text-primary);border:1px solid var(--border);}
+  .char-option{display:flex;align-items:center;gap:10px;background:var(--pill-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:10px;cursor:pointer;}
+  .char-option input{margin:0;}
+  .char-option.selected{border-color:var(--accent-teal);}
+  .char-option.disabled{opacity:0.55;cursor:not-allowed;}
+  .char-note{display:block;font-size:11px;margin-top:3px;}
+  .char-note.busy{color:var(--accent-red);}
+  .char-note.cooldown{color:var(--accent-gold);}
+  .no-char-warn{font-size:13px;color:var(--text-secondary);line-height:1.6;margin-top:10px;}
+  .no-char-warn a{color:var(--accent-gold);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html">Guias</a>
+    <a href="belobra-estatisticas.html">Estatisticas</a>
+    <a href="https://discord.gg/EWehENtQxP" target="_blank" rel="noopener">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <a href="belobra-respawn-list.html" class="back-btn">&#8592; VOLTAR AO DASHBOARD</a>
+
+  <div class="siren-banner" id="siren-banner">
+    <span class="ico">&#128276;</span>
+    <span id="siren-text"></span>
+  </div>
+
+  <div class="rp-head">
+    <div>
+      <h1 id="rp-title">Carregando...</h1>
+      <div class="desc">Sem descricao</div>
+    </div>
+    <div class="rp-actions">
+      <span class="status-pill" id="status-pill">&#9679; LIVRE</span>
+      <button class="btn-join" id="join-btn" onclick="openJoinModal()">Entrar na Fila</button>
+    </div>
+  </div>
+
+  <div class="queue-panel">
+    <div class="queue-panel-head">&#128202; Fila Atual (<span id="queue-count">0</span>/10)</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Jogador</th>
+          <th>Status / Tempo</th>
+          <th>Entrada na fila</th>
+          <th>Inicio da hunt</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="queue-body"></tbody>
+    </table>
+    <div class="empty-queue" id="empty-msg" style="display:none;">Ninguem na fila ainda. Seja o primeiro a entrar!</div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="join-modal">
+  <div class="modal-box">
+    <h3>Entrar na fila</h3>
+    <div id="modal-char-area"></div>
+    <label>Tempo de hunt</label>
+    <select id="input-duration">
+      <option value="60">1 hora (+15min refill)</option>
+      <option value="120">2 horas (+15min refill)</option>
+      <option value="180">3 horas (+15min refill)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeJoinModal()">Cancelar</button>
+      <button class="confirm" onclick="confirmJoin()" id="modal-confirm-btn">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const respawnId = params.get('id');
+const shouldOpenJoin = params.get('join') === '1';
+
+let selectedCharacterId = null;
+let myVerifiedCharacters = [];
+let myCharacterIds = [];
+
+async function boot(){
+  if(!respawnId){
+    document.getElementById('rp-title').textContent = 'Respawn nao encontrado';
+    return;
+  }
+
+  const { data: respawn } = await supabaseClient.from('respawns').select('id, name').eq('id', respawnId).single();
+  document.getElementById('rp-title').textContent = respawn ? respawn.name : 'Respawn nao encontrado';
+  document.title = 'Belobra Respawn List - ' + (respawn ? respawn.name : '');
+
+  const user = await belobraGetUser();
+  if(user){
+    const allChars = await belobraGetMyCharacters();
+    myCharacterIds = allChars.map(c => c.id);
+  }
+
+  await render();
+  setInterval(render, 1000);
+  setInterval(async () => { await belobraTickRespawnQueue(respawnId); }, 3000);
+
+  if(shouldOpenJoin) openJoinModal();
+}
+
+function fmtTime(ts){ return new Date(ts).toTimeString().slice(0,5); }
+function fmtCountdown(ms){
+  if(ms < 0) ms = 0;
+  const totalSec = Math.floor(ms/1000);
+  return Math.floor(totalSec/60) + 'm ' + String(totalSec%60).padStart(2,'0') + 's';
+}
+function fmtHuntRemaining(ms){
+  if(ms < 0) ms = 0;
+  const totalMin = Math.floor(ms/60000);
+  return Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm';
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function playSiren(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    const now = ctx.currentTime;
+    for(let i=0;i<4;i++){
+      osc.frequency.setValueAtTime(600, now + i*0.4);
+      osc.frequency.linearRampToValueAtTime(900, now + i*0.4 + 0.2);
+      osc.frequency.linearRampToValueAtTime(600, now + i*0.4 + 0.4);
+    }
+    osc.start(now);
+    osc.stop(now + 1.6);
+  }catch(e){ /* audio indisponivel */ }
+}
+
+let sirenPlayedFor = null;
+
+async function render(){
+  const q = await belobraLoadRespawnQueue(respawnId);
+  const now = Date.now();
+
+  const pill = document.getElementById('status-pill');
+  const joinBtn = document.getElementById('join-btn');
+  const ocupado = belobraIsOcupado(q);
+  pill.className = 'status-pill ' + (ocupado ? 'ocupado' : 'livre');
+  pill.innerHTML = ocupado ? '&#9679; OCUPADO' : '&#9679; LIVRE';
+
+  const user = await belobraGetUser();
+  if(!user){
+    joinBtn.textContent = 'Entrar com Discord pra caçar';
+    joinBtn.classList.add('discord');
+    joinBtn.onclick = belobraSignInDiscord;
+    joinBtn.disabled = false;
+  } else {
+    joinBtn.textContent = 'Entrar na Fila';
+    joinBtn.classList.remove('discord');
+    joinBtn.onclick = openJoinModal;
+    joinBtn.disabled = belobraQueueCount(q) >= 10;
+  }
+
+  const banner = document.getElementById('siren-banner');
+  if(q.calling){
+    const callKey = q.calling.id + '-' + q.calling.deadline;
+    if(sirenPlayedFor !== callKey){
+      playSiren();
+      sirenPlayedFor = callKey;
+    }
+    banner.classList.add('show');
+    document.getElementById('siren-text').innerHTML = 'É a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando confirmacao...';
+  } else if(q.active && q.active.afkChallengeDeadline && myCharacterIds.includes(q.active.characterId)){
+    const afkKey = 'afk-' + q.active.id + '-' + q.active.afkChallengeDeadline;
+    if(sirenPlayedFor !== afkKey){
+      playSiren();
+      sirenPlayedFor = afkKey;
+    }
+    banner.classList.add('show');
+    banner.classList.add('afk-alert');
+    document.getElementById('siren-text').innerHTML = '&#128276; Voce foi reportado como AFK! Confirme sua presenca na tabela abaixo antes do tempo acabar.';
+  } else {
+    banner.classList.remove('show');
+    banner.classList.remove('afk-alert');
+  }
+
+  document.getElementById('queue-count').textContent = (q.active?1:0) + belobraQueueCount(q);
+
+  let iAmNextInLine = false;
+  let canReportAfkNow = true;
+  if(user && q.waiting.length > 0){
+    iAmNextInLine = myCharacterIds.includes(q.waiting[0].characterId);
+  }
+  if(iAmNextInLine){
+    const { data: profile } = await supabaseClient.from('profiles').select('last_afk_report_at').eq('id', user.id).single();
+    if(profile && profile.last_afk_report_at){
+      const lastReport = new Date(profile.last_afk_report_at).getTime();
+      canReportAfkNow = (now - lastReport) > 60*60000;
+    }
+  }
+
+  const rows = [];
+  if(q.active) rows.push({ kind:'active', ...q.active });
+  if(q.calling) rows.push({ kind:'calling', ...q.calling });
+  q.waiting.forEach(w => rows.push({ kind:'waiting', ...w }));
+
+  const tbody = document.getElementById('queue-body');
+  const emptyMsg = document.getElementById('empty-msg');
+
+  if(rows.length === 0){
+    tbody.innerHTML = '';
+    emptyMsg.style.display = 'block';
+  } else {
+    emptyMsg.style.display = 'none';
+    tbody.innerHTML = rows.map((r, i) => {
+      let statusCell, timeCell, actionsCell, previstoCell;
+      const tag = r.type === 'maker' ? 'MAKER' : 'PRINCIPAL';
+      const joinedCell = r.joinedAt ? fmtTime(r.joinedAt) : '&mdash;';
+      const isMine = myCharacterIds.includes(r.characterId);
+
+      if(r.kind === 'active'){
+        statusCell = '<span class="chip cacando">&#9876;&#65039; CACANDO</span>';
+        const remain = (r.durationMin + 15) * 60000 - (now - r.startedAt);
+        timeCell = '<span class="timer-chip">&#9201; ' + fmtHuntRemaining(remain) + '</span>';
+        if(isMine && r.afkChallengeDeadline){
+          const afkRemain = r.afkChallengeDeadline - now;
+          actionsCell = '<div class="row-actions">' +
+            '<button class="btn-mini confirm-presence" onclick="confirmPresence(' + r.id + ')">Confirmar presenca (' + fmtCountdown(afkRemain) + ')</button></div>';
+        } else if(isMine){
+          actionsCell = '<button class="btn-mini end" onclick="endHunt(' + r.id + ')">Encerrar Hunt</button>';
+        } else if(iAmNextInLine){
+          actionsCell = canReportAfkNow
+            ? '<button class="btn-mini report-afk" onclick="reportAfk(' + r.id + ')">&#128276; Reportar AFK</button>'
+            : '<span class="muted" title="Voce ja reportou AFK ha menos de 1 hora">Reportar AFK (aguarde)</span>';
+        } else {
+          actionsCell = '<span class="muted">&mdash;</span>';
+        }
+        previstoCell = r.afkChallengeDeadline ? '<span class="previsto" style="color:var(--accent-red);">Reportado AFK!</span>' : '<span class="previsto">Em andamento</span>';
+      } else if(r.kind === 'calling'){
+        statusCell = '<span class="chip aguardando">&#128276; AGUARDANDO</span>';
+        const remain = r.deadline - now;
+        timeCell = '<span class="timer-chip countdown">&#9201; ' + fmtCountdown(remain) + '</span>';
+        actionsCell = isMine
+          ? '<div class="row-actions">' +
+            '<button class="btn-mini accept" onclick="acceptVaga(' + r.id + ')">Aceitar Vaga</button>' +
+            '<button class="btn-mini cancel" onclick="leaveQueue(' + r.id + ')">Desistir</button></div>'
+          : '<span class="muted">&mdash;</span>';
+        previstoCell = '<span class="previsto">Confirmar agora</span>';
+      } else {
+        statusCell = '<span class="chip fila">&#9203; NA FILA</span>';
+        timeCell = '<span class="muted">&mdash;</span>';
+        actionsCell = isMine
+          ? '<button class="btn-mini cancel" onclick="leaveQueue(' + r.id + ')">Sair da fila</button>'
+          : '<span class="muted">&mdash;</span>';
+        previstoCell = '<span class="previsto">Na fila</span>';
+      }
+
+      return '<tr>' +
+        '<td><div class="pos-badge">' + (i+1) + '</div></td>' +
+        '<td><span class="player-name">' + escapeHtml(r.name) + '</span><span class="player-tag">' + tag + '</span></td>' +
+        '<td>' + statusCell + ' ' + timeCell + '</td>' +
+        '<td class="muted">' + joinedCell + '</td>' +
+        '<td>' + previstoCell + '</td>' +
+        '<td>' + actionsCell + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+}
+
+async function openJoinModal(){
+  const user = await belobraGetUser();
+  if(!user){ belobraSignInDiscord(); return; }
+
+  const allChars = await belobraGetMyCharacters();
+  myVerifiedCharacters = allChars.filter(c => c.verified);
+
+  const area = document.getElementById('modal-char-area');
+  const confirmBtn = document.getElementById('modal-confirm-btn');
+
+  if(myVerifiedCharacters.length === 0){
+    area.innerHTML = `
+      <div class="no-char-warn">
+        Voce ainda nao tem nenhum personagem verificado. Cadastre e verifique um personagem antes de entrar na fila.
+        <br><a href="belobra-personagem.html">Ir para Trocar Personagem &#8594;</a>
+      </div>`;
+    confirmBtn.disabled = true;
+    document.getElementById('join-modal').classList.add('show');
+    return;
+  }
+
+  const availability = await belobraGetCharacterAvailability(myVerifiedCharacters.map(c => c.id));
+
+  const myRole = await belobraGetMyRole();
+  if(myRole === 'admin'){
+    Object.values(availability).forEach(a => { a.cooldownUntil = null; });
+  }
+
+  const firstAvailable = myVerifiedCharacters.find(c => {
+    const a = availability[c.id];
+    return a && !a.busy && !a.cooldownUntil;
+  });
+  selectedCharacterId = firstAvailable ? firstAvailable.id : null;
+
+  confirmBtn.disabled = !selectedCharacterId;
+  area.innerHTML = `
+    <label>Qual personagem vai usar?</label>
+    ${myVerifiedCharacters.map(c => {
+      const a = availability[c.id] || {};
+      const isSelected = c.id === selectedCharacterId;
+      let noteHtml = '';
+      let disabled = false;
+
+      if(a.busy){
+        const withWho = (a.busyWith && a.busyWith !== c.name) ? ` (${escapeHtml(a.busyWith)} esta em uso)` : '';
+        noteHtml = `<span class="char-note busy">Sua conta ja esta em outra fila ou caçando${withWho}</span>`;
+        disabled = true;
+      } else if(a.cooldownUntil){
+        noteHtml = `<span class="char-note cooldown" data-until="${a.cooldownUntil}">Em cooldown</span>`;
+        disabled = true;
+      }
+
+      return `
+        <label class="char-option ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" ${disabled ? '' : `onclick="selectChar(${c.id})"`}>
+          <input type="radio" name="char-radio" value="${c.id}" ${isSelected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+          <span>${escapeHtml(c.name)} <span class="muted">(${c.type === 'main' ? 'Principal' : 'Maker'})</span>${noteHtml}</span>
+        </label>
+      `;
+    }).join('')}
+  `;
+
+  document.getElementById('join-modal').classList.add('show');
+  startCooldownTicker();
+}
+
+let cooldownTickerId = null;
+function startCooldownTicker(){
+  if(cooldownTickerId) clearInterval(cooldownTickerId);
+  cooldownTickerId = setInterval(() => {
+    document.querySelectorAll('.char-note.cooldown').forEach(el => {
+      const until = parseInt(el.dataset.until, 10);
+      const remain = until - Date.now();
+      if(remain <= 0){
+        openJoinModal(); // reabre atualizado quando o cooldown zera
+        return;
+      }
+      const m = Math.floor(remain / 60000);
+      const s = Math.floor((remain % 60000) / 1000);
+      el.textContent = `Cooldown: ${m}m ${String(s).padStart(2,'0')}s`;
+    });
+  }, 1000);
+}
+
+function selectChar(id){
+  selectedCharacterId = id;
+  document.querySelectorAll('.char-option').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('modal-confirm-btn').disabled = false;
+}
+
+function closeJoinModal(){
+  document.getElementById('join-modal').classList.remove('show');
+  if(cooldownTickerId){ clearInterval(cooldownTickerId); cooldownTickerId = null; }
+}
+
+async function confirmJoin(){
+  if(!selectedCharacterId) return;
+  const durationMin = parseInt(document.getElementById('input-duration').value, 10);
+  try{
+    await belobraJoinRespawnQueue(respawnId, selectedCharacterId, durationMin);
+    closeJoinModal();
+    await belobraTickRespawnQueue(respawnId);
+    render();
+  }catch(e){
+    let msg = e.message || 'Erro desconhecido';
+    if(msg.includes('BANIDO_PERMANENTE')){
+      msg = 'Sua conta esta banida PERMANENTEMENTE do sistema de filas. Se acha que isso e um engano, abra um ticket de revisao na Central de Suporte.';
+    } else if(msg.includes('BANIDO_TEMP:')){
+      const dateStr = msg.split('BANIDO_TEMP:')[1];
+      const date = new Date(dateStr);
+      msg = `Sua conta esta banida do sistema de filas ate ${date.toLocaleString('pt-BR')}. Se acha que isso e um engano, abra um ticket de revisao na Central de Suporte.`;
+    } else if(msg.includes('ja esta em uma fila')){
+      msg = 'Sua conta (Main ou Maker) ja esta em outra fila ou caçando em outro respawn agora.';
+    } else if(msg.includes('cooldown')){
+      msg = 'Sua conta ainda esta de cooldown apos sair de uma fila/hunt recentemente. Aguarde e tente de novo.';
+    }
+    alert(msg);
+    openJoinModal();
+  }
+}
+
+async function endHunt(entryId){
+  await belobraEndHunt(entryId);
+  render();
+}
+async function reportAfk(entryId){
+  if(!confirm('Reportar esse jogador como AFK? Ele tera 5 minutos pra confirmar presenca, ou perde a vaga. Voce so pode fazer isso 1x por hora.')) return;
+  try{
+    await belobraReportAfk(entryId);
+    render();
+  }catch(e){
+    alert(e.message);
+  }
+}
+async function confirmPresence(entryId){
+  try{
+    await belobraConfirmAfkPresence(entryId);
+    render();
+  }catch(e){
+    alert(e.message);
+  }
+}
+async function acceptVaga(entryId){
+  await belobraAcceptVaga(entryId);
+  render();
+}
+async function leaveQueue(entryId){
+  await belobraLeaveQueueEntry(entryId);
+  render();
+}
+
+boot();
+</script>
+
+</body>
+</html>

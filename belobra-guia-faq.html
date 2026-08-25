@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Belobra Respawn List - FAQ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-page:#0b0d12;
+    --bg-nav:#0e1016;
+    --bg-card:#12151c;
+    --border:#232733;
+    --text-primary:#eef0f5;
+    --text-secondary:#8b8f9c;
+    --text-muted:#5c606c;
+    --accent-gold:#e0a94a;
+    --accent-teal:#2fbf87;
+    --pill-bg:#1b1e27;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg-page);color:var(--text-primary);font-family:'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;}
+  header{
+    background:var(--bg-nav);
+    border-bottom:2px solid;
+    border-image:linear-gradient(90deg,var(--accent-gold),var(--accent-teal)) 1;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 32px;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:10;
+  }
+  .logo{display:flex;align-items:baseline;gap:8px;font-weight:700;font-size:20px;}
+  .logo .brand{color:var(--accent-gold);}
+  .logo .sub{color:var(--text-secondary);font-weight:400;font-size:14px;letter-spacing:2px;}
+  nav{display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+  nav a{color:var(--text-secondary);text-decoration:none;font-size:14px;}
+  nav a:hover, nav a.current{color:var(--accent-gold);}
+  .support{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none !important;}
+  .user{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-teal);}
+
+  main{max-width:760px;margin:0 auto;padding:40px 24px 90px;}
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--accent-teal);
+    text-decoration:none;
+    margin-bottom:22px;
+  }
+  .back-link:hover{color:var(--accent-gold);}
+
+  article h1{font-size:26px;line-height:1.3;margin-bottom:14px;}
+  .lead{color:var(--text-secondary);font-size:15px;line-height:1.6;margin-bottom:16px;}
+  .meta-line{display:flex;gap:16px;font-size:12px;color:var(--text-muted);margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+
+  h2.faq-section{font-size:16px;color:var(--accent-teal);letter-spacing:0.5px;margin:32px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+  details{
+    background:var(--bg-card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 18px;
+    margin-bottom:10px;
+  }
+  details summary{
+    font-size:14px;
+    font-weight:600;
+    color:var(--text-primary);
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{
+    content:"+";
+    color:var(--accent-gold);
+    font-size:18px;
+    font-weight:400;
+  }
+  details[open] summary::after{content:"\2212";}
+  details p{
+    font-size:14px;
+    color:var(--text-secondary);
+    line-height:1.6;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid var(--border);
+  }
+  details a{color:var(--accent-gold);}
+
+  .cta{margin-top:32px;padding:22px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;text-align:center;}
+  .cta p{margin-bottom:14px;color:var(--text-secondary);font-size:14px;}
+  .cta a{display:inline-block;background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;padding:10px 24px;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="brand">BELOBRA</span><span class="sub">RESPAWN LIST</span></div>
+  <nav>
+    <a href="belobra-respawn-list.html">Respawns</a>
+    <a href="belobra-regras.html">Regras</a>
+    <a href="belobra-guias.html" class="current">Guias</a>
+    <a href="belobra-estatisticas.html">Estatísticas</a>
+    <a href="https://discord.gg/EWehENtQxP" target="_blank" rel="noopener">Discord</a>
+    <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
+  </nav>
+  <div class="user" id="belobra-user-widget" style="position:relative;"></div>
+</header>
+
+<main>
+  <a href="belobra-guias.html" class="back-link">&#8592; Voltar aos Guias</a>
+
+  <article>
+    <h1>Perguntas frequentes sobre a Cartinha Online</h1>
+    <p class="lead">As dúvidas mais comuns dos jogadores reunidas em um só lugar: fila, cadastro, punições, suporte e funcionamento geral da plataforma.</p>
+    <div class="meta-line"><span>10 min de leitura</span></div>
+
+    <h2 class="faq-section">Sobre a Cartinha Online</h2>
+
+    <details>
+      <summary>O que e a Cartinha Online?</summary>
+      <p>E uma plataforma web gratuita e independente, criada pra organizar os respawns (locais de caça) do servidor Belobra de forma justa e automática. Com mais de 1.500 contas cadastradas, virou a ferramenta essencial pra quem joga no servidor.</p>
+    </details>
+
+    <details>
+      <summary>A Cartinha Online e oficial do servidor Belobra?</summary>
+      <p>Não. A Cartinha Online e uma ferramenta independente, feita pela comunidade pra comunidade. Não há vinculo oficial, afiliacao ou aval da CipSoft GmbH ou da administracao do servidor Belobra.</p>
+    </details>
+
+    <details>
+      <summary>E gratuita?</summary>
+      <p>Sim, a Cartinha Online e 100% gratuita pra qualquer jogador do servidor Belobra.</p>
+    </details>
+
+    <h2 class="faq-section">Sobre o cadastro</h2>
+
+    <details>
+      <summary>Como eu me cadastro?</summary>
+      <p>E só clicar em "Entrar com Discord", autorizar o acesso e informar o nome exato do seu personagem no servidor Belobra em "Trocar Personagem". O sistema gera um código que você precisa colar no campo "Comment" do personagem em tibia.com — depois clica em "Verificar" pra confirmar que o personagem é seu de verdade.</p>
+    </details>
+
+    <details>
+      <summary>Preciso ter conta no Discord?</summary>
+      <p>Sim. O login e feito exclusivamente pelo Discord, por questão de segurança e praticidade — e a maioria de quem joga no Belobra já tem conta por lá mesmo.</p>
+    </details>
+
+    <details>
+      <summary>Da pra cadastrar mais de um personagem?</summary>
+      <p>Sim, você pode cadastrar seu Main e um Maker. Os dois precisam existir de verdade no servidor Belobra e pertencer a você.</p>
+    </details>
+
+    <details>
+      <summary>Mudei o nome do meu personagem, e agora?</summary>
+      <p>Va no menu e clique em "Trocar Personagem" pra atualizar. Se der algum problema, abra um ticket de suporte.</p>
+    </details>
+
+    <h2 class="faq-section">Sobre as filas</h2>
+
+    <details>
+      <summary>Posso entrar em mais de uma fila ao mesmo tempo?</summary>
+      <p>Não. A regra vale pra sua <b>conta inteira</b>: se seu Main está numa fila ou caçando, o Maker fica bloqueado de entrar em qualquer outro respawn, e vice-versa. Isso e travado direto no sistema, nao da pra burlar.</p>
+    </details>
+
+    <details>
+      <summary>O que acontece se eu não aceitar a vaga a tempo?</summary>
+      <p>Se você não confirmar em até 5 minutos, a vaga passa automaticamente pro próximo da fila, e você entra num cooldown de 5 minutos antes de poder entrar em outra fila.</p>
+    </details>
+
+    <details>
+      <summary>Quanto tempo posso ficar no respawn?</summary>
+      <p>Você escolhe entre 1, 2 ou 3 horas na hora de entrar na fila. O sistema já soma automaticamente +15 minutos de bonus pra refill.</p>
+    </details>
+
+    <details>
+      <summary>E se eu precisar sair antes do tempo acabar?</summary>
+      <p>Sem problema, e só clicar em "Encerrar Hunt". Isso libera o respawn pro próximo da fila, e você entra num cooldown de 5 minutos.</p>
+    </details>
+
+    <h2 class="faq-section">Sobre reports e punições</h2>
+
+    <details>
+      <summary>O que e o Report AFK?</summary>
+      <p>E um botão que só o <b>próximo da fila</b> enxerga, do lado do nome de quem está caçando. Ao clicar, a pessoa reportada tem 5 minutos pra confirmar presença na tela, ou perde a vaga automaticamente. Nao tem descricao nem anexo — e uma acao instantanea, diferente de abrir um ticket.</p>
+    </details>
+
+    <details>
+      <summary>Qualquer um pode usar o Report AFK?</summary>
+      <p>Não. Só quem está em <b>primeiro lugar</b> na fila daquele respawn especifico ve o botão. E cada conta só pode usar isso <b>1 vez por hora</b>, pra evitar abuso.</p>
+    </details>
+
+    <details>
+      <summary>Posso ser punido por reportar alguém?</summary>
+      <p>O Report AFK em si não gera punição pra quem usa — ele já tem trava de 1x por hora embutida. Já denuncias abusivas ou feitas em massa pelo sistema de tickets podem ser tratadas como mau uso.</p>
+    </details>
+
+    <details>
+      <summary>Quem pode denunciar um jogador pelo botão "Denunciar"?</summary>
+      <p>Só quem estiver <b>na fila esperando vaga</b> daquele respawn especifico. E não da pra abrir uma segunda denúncia contra a mesma pessoa enquanto a primeira ainda estiver em aberto.</p>
+    </details>
+
+    <details>
+      <summary>Fui banido e acho que foi injusto, o que fazer?</summary>
+      <p>Va em "Central de Suporte" no menu do seu perfil, abra um "Novo Ticket" na categoria "Revisão de Banimento", explique sua versão com detalhes e anexe provas se tiver. A administracao vai analisar o caso.</p>
+    </details>
+
+    <details>
+      <summary>Como funciona a escala de banimento?</summary>
+      <p>E progressiva: 1a vez, 1 dia banido. 2a vez, 7 dias. 3a vez, 30 dias. 4a vez, banimento permanente. Vale pra conta inteira, Main e Maker juntos.</p>
+    </details>
+
+    <h2 class="faq-section">Sobre suporte</h2>
+
+    <details>
+      <summary>Como falo com a administracao?</summary>
+      <p>Da pra abrir um ticket de suporte pelo menu do site ou entrar em contato pelo Discord oficial do Belobra.</p>
+    </details>
+
+    <details>
+      <summary>Quanto tempo demora pra responderem meu ticket?</summary>
+      <p>A administracao busca responder o mais rapido possível, geralmente dentro de 24 a 48 horas.</p>
+    </details>
+
+    <details>
+      <summary>Da pra acompanhar o status do meu ticket?</summary>
+      <p>Sim. Acesse "Meus Tickets" no menu pra ver o andamento atualizado de todos os seus tickets.</p>
+    </details>
+
+    <div class="cta">
+      <p>Não encontrou o que precisava? Fale direto com a gente.</p>
+      <a href="belobra-guia-tickets.html">Como abrir um ticket</a>
+    </div>
+  </article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="belobra-app.js"></script>
+</body>
+</html>
