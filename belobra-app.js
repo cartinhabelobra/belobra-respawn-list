@@ -120,6 +120,7 @@ async function belobraGetVerifiedCharacters(){
 async function belobraSaveCharacter(name, type){
   const user = await belobraGetUser();
   if(!user) throw new Error('Voce precisa estar logado.');
+  if(!['main','maker'].includes(type)) throw new Error('Tipo de personagem invalido.');
 
   const code = belobraGenerateCode();
 
@@ -149,6 +150,56 @@ async function belobraSaveCharacter(name, type){
     if(error) throw error;
     return data;
   }
+}
+
+// ------------------------------------------------------------
+// Service — personagem de outra conta usado com autorizacao
+// ------------------------------------------------------------
+async function belobraGetMyServicePermissions(){
+  const { data, error } = await supabaseClient.rpc('get_my_service_permissions');
+  if(error) throw error;
+  return data || [];
+}
+
+async function belobraGetMyServiceCharacters(){
+  const { data, error } = await supabaseClient.rpc('get_my_service_characters');
+  if(error) throw error;
+  return (data || []).map(c => ({
+    id: c.id,
+    name: c.name,
+    type: 'service',
+    verified: !!c.verified,
+    ownerProfileId: c.owner_profile_id,
+    servicePermissionId: c.service_permission_id
+  }));
+}
+
+async function belobraGetMyQueueCharacterOptions(){
+  const own = (await belobraGetVerifiedCharacters()).map(c => ({
+    ...c,
+    servicePermissionId: null
+  }));
+  let service = [];
+  try { service = await belobraGetMyServiceCharacters(); }
+  catch(e){ console.warn('Service ainda nao configurado:', e.message); }
+  return own.concat(service);
+}
+
+async function belobraCreateServiceInvite(characterId){
+  const { data, error } = await supabaseClient.rpc('create_service_invite', { p_character_id: characterId });
+  if(error) throw error;
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function belobraAcceptServiceInvite(inviteCode){
+  const { data, error } = await supabaseClient.rpc('accept_service_invite', { p_invite_code: inviteCode.trim() });
+  if(error) throw error;
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function belobraRevokeServicePermission(permissionId){
+  const { error } = await supabaseClient.rpc('revoke_service_permission', { p_permission_id: permissionId });
+  if(error) throw error;
 }
 
 // Chama a Edge Function que confere o comentario do personagem no tibia.com
@@ -188,7 +239,9 @@ function belobraGroupQueueRows(rows){
       startedAt: r.started_at ? new Date(r.started_at).getTime() : null,
       deadline: r.call_deadline ? new Date(r.call_deadline).getTime() : null,
       characterId: r.character_id,
-      afkChallengeDeadline: r.afk_challenge_deadline ? new Date(r.afk_challenge_deadline).getTime() : null
+      afkChallengeDeadline: r.afk_challenge_deadline ? new Date(r.afk_challenge_deadline).getTime() : null,
+      queuedByProfileId: r.queued_by_profile_id || null,
+      servicePermissionId: r.service_permission_id || null
     };
     if(r.status === 'active') active = entry;
     else if(r.status === 'calling') calling = entry;
@@ -201,7 +254,7 @@ function belobraGroupQueueRows(rows){
 async function belobraLoadRespawnQueue(respawnId){
   const { data, error } = await supabaseClient
     .from('queue_entries')
-    .select('id, respawn_id, character_id, status, duration_min, joined_at, started_at, call_deadline, afk_challenge_deadline, characters(name, type)')
+    .select('id, respawn_id, character_id, status, duration_min, joined_at, started_at, call_deadline, afk_challenge_deadline, queued_by_profile_id, service_permission_id, characters(name, type)')
     .eq('respawn_id', respawnId)
     .order('joined_at', { ascending: true });
   if(error){ console.error(error); return { active:null, calling:null, waiting:[] }; }
@@ -225,53 +278,29 @@ async function belobraTickRespawnQueue(respawnId){
 function belobraIsOcupado(q){ return !!q.active || !!q.calling; }
 function belobraQueueCount(q){ return q.waiting.length + (q.calling ? 1 : 0); }
 
-async function belobraJoinRespawnQueue(respawnId, characterId, durationMin){
-  const { error } = await supabaseClient.from('queue_entries').insert({
-    respawn_id: respawnId,
-    character_id: characterId,
-    duration_min: durationMin,
-    status: 'waiting',
-    joined_at: new Date().toISOString()
+async function belobraJoinRespawnQueue(respawnId, characterId, durationMin, servicePermissionId = null){
+  const { data, error } = await supabaseClient.rpc('join_respawn_queue', {
+    p_respawn_id: respawnId,
+    p_character_id: characterId,
+    p_duration_min: durationMin,
+    p_service_permission_id: servicePermissionId || null
   });
   if(error) throw error;
+  return data;
 }
 
 async function belobraEndHunt(entryId){
-  // Antes de apagar, grava um registro no historico (pra alimentar as Estatisticas)
-  const { data: entry } = await supabaseClient
-    .from('queue_entries')
-    .select('respawn_id, character_id, duration_min, started_at, joined_at')
-    .eq('id', entryId)
-    .single();
-
-  if(entry && entry.started_at){
-    const startedAt = new Date(entry.started_at);
-    const endedAt = new Date();
-    const waitMin = entry.joined_at ? Math.round((startedAt - new Date(entry.joined_at)) / 60000) : 0;
-    await supabaseClient.from('stats_log').insert({
-      respawn_id: entry.respawn_id,
-      character_id: entry.character_id,
-      duration_min: Math.round((endedAt - startedAt) / 60000),
-      wait_min: Math.max(0, waitMin),
-      started_at: entry.started_at,
-      ended_at: endedAt.toISOString()
-    });
-  }
-
-  const { error } = await supabaseClient.from('queue_entries').delete().eq('id', entryId);
+  const { error } = await supabaseClient.rpc('service_end_hunt', { p_entry_id: entryId });
   if(error) throw error;
 }
 
 async function belobraAcceptVaga(entryId){
-  const { error } = await supabaseClient
-    .from('queue_entries')
-    .update({ status:'active', started_at: new Date().toISOString(), call_deadline: null })
-    .eq('id', entryId);
+  const { error } = await supabaseClient.rpc('service_accept_queue', { p_entry_id: entryId });
   if(error) throw error;
 }
 
 async function belobraLeaveQueueEntry(entryId){
-  const { error } = await supabaseClient.from('queue_entries').delete().eq('id', entryId);
+  const { error } = await supabaseClient.rpc('service_leave_queue', { p_entry_id: entryId });
   if(error) throw error;
 }
 
@@ -279,7 +308,7 @@ async function belobraLeaveQueueEntry(entryId){
 async function belobraLoadAllQueueStatus(){
   const { data, error } = await supabaseClient
     .from('queue_entries')
-    .select('id, respawn_id, status, duration_min, started_at, character_id, characters(name, type)');
+    .select('id, respawn_id, status, duration_min, started_at, character_id, service_permission_id, characters(name, type)');
   const map = {};
   if(error){ console.error(error); return map; }
   (data || []).forEach(r => {
@@ -287,7 +316,7 @@ async function belobraLoadAllQueueStatus(){
     if(r.status === 'active'){
       map[r.respawn_id].active = true;
       map[r.respawn_id].activeName = r.characters ? r.characters.name : null;
-      map[r.respawn_id].activeType = r.characters ? r.characters.type : null;
+      map[r.respawn_id].activeType = r.service_permission_id ? 'service' : (r.characters ? r.characters.type : null);
       map[r.respawn_id].activeCharacterId = r.character_id;
       map[r.respawn_id].huntEndsAt = new Date(r.started_at).getTime() + (r.duration_min + 15) * 60000;
     }
@@ -308,42 +337,40 @@ async function belobraGetCharacterAvailability(characterIds){
   const user = await belobraGetUser();
   if(!user) return map;
 
-  const { data: busyRows } = await supabaseClient
-    .from('queue_entries')
-    .select('id, character_id, respawn_id, status, duration_min, started_at, call_deadline, characters(name, profile_id)')
-    .in('character_id', characterIds);
+  const loadRows = async () => {
+    const { data, error } = await supabaseClient
+      .from('queue_entries')
+      .select('id, character_id, respawn_id, status, duration_min, started_at, call_deadline, queued_by_profile_id, characters(name, profile_id)')
+      .in('character_id', characterIds);
+    if(error) throw error;
+    return data || [];
+  };
 
+  const rows = await loadRows();
   const respawnsToClean = new Set();
   const now = Date.now();
-  let busyCharacterName = null;
-
-  (busyRows || []).forEach(r => {
+  rows.forEach(r => {
     let expired = false;
     if(r.status === 'active' && r.started_at){
       const endsAt = new Date(r.started_at).getTime() + (r.duration_min + 15) * 60000;
       if(now >= endsAt) expired = true;
     }
-    if(r.status === 'calling' && r.call_deadline){
-      if(now > new Date(r.call_deadline).getTime()) expired = true;
-    }
+    if(r.status === 'calling' && r.call_deadline && now > new Date(r.call_deadline).getTime()) expired = true;
     if(expired) respawnsToClean.add(r.respawn_id);
-    else busyCharacterName = r.characters ? r.characters.name : busyCharacterName;
   });
 
   for(const respawnId of respawnsToClean){
     try{ await belobraTickRespawnQueue(respawnId); }catch(e){ console.error(e); }
   }
 
-  // Reconsulta depois da limpeza, pra saber se a CONTA ainda esta ocupada
-  const { data: busyRowsFresh } = await supabaseClient
-    .from('queue_entries')
-    .select('id, characters(name, profile_id)')
-    .in('character_id', characterIds);
-
-  const accountBusy = (busyRowsFresh || []).length > 0;
-  if(accountBusy && busyRowsFresh[0].characters){
-    busyCharacterName = busyRowsFresh[0].characters.name;
-  }
+  const freshRows = await loadRows();
+  const ownRows = freshRows.filter(r => r.queued_by_profile_id === user.id);
+  const accountBusy = ownRows.length > 0;
+  const ownBusyName = ownRows[0]?.characters?.name || null;
+  const usedByOther = {};
+  freshRows.filter(r => r.queued_by_profile_id !== user.id).forEach(r => {
+    usedByOther[r.character_id] = r.characters?.name || 'outro jogador';
+  });
 
   const { data: profile } = await supabaseClient
     .from('profiles')
@@ -354,9 +381,10 @@ async function belobraGetCharacterAvailability(characterIds){
   const onCooldown = cooldownUntil && cooldownUntil > Date.now();
 
   characterIds.forEach(id => {
+    const otherName = usedByOther[id] || null;
     map[id] = {
-      busy: accountBusy,
-      busyWith: accountBusy ? busyCharacterName : null,
+      busy: accountBusy || !!otherName,
+      busyWith: accountBusy ? ownBusyName : otherName,
       cooldownUntil: onCooldown ? cooldownUntil : null
     };
   });
@@ -369,17 +397,10 @@ async function belobraGetMyActiveEntry(){
   const user = await belobraGetUser();
   if(!user) return null;
 
-  const { data: myChars } = await supabaseClient
-    .from('characters')
-    .select('id')
-    .eq('profile_id', user.id);
-  const myCharIds = (myChars || []).map(c => c.id);
-  if(!myCharIds.length) return null;
-
   const { data, error } = await supabaseClient
     .from('queue_entries')
-    .select('id, respawn_id, status, duration_min, started_at, call_deadline, joined_at, afk_challenge_deadline, characters(name, type), respawns(name)')
-    .in('character_id', myCharIds)
+    .select('id, respawn_id, status, duration_min, started_at, call_deadline, joined_at, afk_challenge_deadline, queued_by_profile_id, service_permission_id, characters(name, type), respawns(name)')
+    .eq('queued_by_profile_id', user.id)
     .limit(1)
     .maybeSingle();
 
@@ -390,7 +411,8 @@ async function belobraGetMyActiveEntry(){
     respawnId: data.respawn_id,
     respawnName: data.respawns ? data.respawns.name : '?',
     characterName: data.characters ? data.characters.name : '?',
-    characterType: data.characters ? data.characters.type : 'main',
+    characterType: data.service_permission_id ? 'service' : (data.characters ? data.characters.type : 'main'),
+    servicePermissionId: data.service_permission_id || null,
     status: data.status,
     durationMin: data.duration_min,
     startedAt: data.started_at ? new Date(data.started_at).getTime() : null,
@@ -406,14 +428,10 @@ async function belobraGetMyWaitingRespawnIds(){
   const user = await belobraGetUser();
   if(!user) return [];
 
-  const { data: myChars } = await supabaseClient.from('characters').select('id').eq('profile_id', user.id);
-  const myCharIds = (myChars || []).map(c => c.id);
-  if(!myCharIds.length) return [];
-
   const { data } = await supabaseClient
     .from('queue_entries')
     .select('respawn_id')
-    .in('character_id', myCharIds)
+    .eq('queued_by_profile_id', user.id)
     .eq('status', 'waiting');
 
   return (data || []).map(r => r.respawn_id);
@@ -486,13 +504,13 @@ async function belobraCreateTicket(category, description, characterId, attachmen
 
 // So o proximo da fila consegue chamar isso com sucesso (validado no banco)
 async function belobraReportAfk(targetEntryId){
-  const { error } = await supabaseClient.rpc('report_afk', { target_entry_id: targetEntryId });
+  const { error } = await supabaseClient.rpc('service_report_afk', { p_target_entry_id: targetEntryId });
   if(error) throw error;
 }
 
 // Chamado pelo proprio caçador pra provar que esta la
 async function belobraConfirmAfkPresence(entryId){
-  const { error } = await supabaseClient.rpc('confirm_afk_presence', { entry_id: entryId });
+  const { error } = await supabaseClient.rpc('service_confirm_afk', { p_entry_id: entryId });
   if(error) throw error;
 }
 

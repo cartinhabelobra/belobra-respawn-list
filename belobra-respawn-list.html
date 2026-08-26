@@ -352,7 +352,7 @@ async function renderMyStatus(){
         <span class="ico">${isUrgent ? '&#128276;' : (entry.status === 'active' ? '&#9876;&#65039;' : (entry.status === 'calling' ? '&#128276;' : '&#9203;'))}</span>
         <div class="info">
           <div>${statusText} em <b>${entry.respawnName}</b> ${timerHtml}</div>
-          <div class="sub">${entry.characterName} (${entry.characterType === 'maker' ? 'Maker' : 'Principal'})</div>
+          <div class="sub">${entry.characterName} (${entry.characterType === 'service' ? 'Service' : (entry.characterType === 'maker' ? 'Maker' : 'Principal')})</div>
         </div>
       </div>
       <div class="actions">
@@ -443,7 +443,7 @@ async function render(){
           <div class="hunter-row">
             <span class="hunter-ico">&#9876;&#65039;</span>
             <span class="hunter-name">${r.activeName}</span>
-            <span class="hunter-tag">${r.activeType === 'maker' ? 'MAKER' : 'PRINCIPAL'}</span>
+            <span class="hunter-tag">${r.activeType === 'service' ? 'SERVICE' : (r.activeType === 'maker' ? 'MAKER' : 'PRINCIPAL')}</span>
             ${reportLink}
           </div>` : '';
       return `

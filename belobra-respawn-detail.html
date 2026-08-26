@@ -200,6 +200,7 @@ const respawnId = params.get('id');
 const shouldOpenJoin = params.get('join') === '1';
 
 let selectedCharacterId = null;
+let selectedServicePermissionId = null;
 let myVerifiedCharacters = [];
 let myCharacterIds = [];
 
@@ -237,6 +238,8 @@ function fmtHuntRemaining(ms){
   const totalMin = Math.floor(ms/60000);
   return Math.floor(totalMin/60) + 'h ' + (totalMin%60) + 'm';
 }
+function entryIsMine(entry, user){ return !!(user && ((entry.queuedByProfileId && entry.queuedByProfileId === user.id) || (!entry.queuedByProfileId && myCharacterIds.includes(entry.characterId)))); }
+
 function escapeHtml(str){
   const div = document.createElement('div');
   div.textContent = str;
@@ -297,7 +300,7 @@ async function render(){
     }
     banner.classList.add('show');
     document.getElementById('siren-text').innerHTML = 'Chegou a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando Confirmação...';
-  } else if(q.active && q.active.afkChallengeDeadline && myCharacterIds.includes(q.active.characterId)){
+  } else if(q.active && q.active.afkChallengeDeadline && entryIsMine(q.active, user)){
     const afkKey = 'afk-' + q.active.id + '-' + q.active.afkChallengeDeadline;
     if(sirenPlayedFor !== afkKey){
       playSiren();
@@ -316,7 +319,7 @@ async function render(){
   let iAmNextInLine = false;
   let canReportAfkNow = true;
   if(user && q.waiting.length > 0){
-    iAmNextInLine = myCharacterIds.includes(q.waiting[0].characterId);
+    iAmNextInLine = entryIsMine(q.waiting[0], user);
   }
   if(iAmNextInLine){
     const { data: profile } = await supabaseClient.from('profiles').select('last_afk_report_at').eq('id', user.id).single();
@@ -341,9 +344,9 @@ async function render(){
     emptyMsg.style.display = 'none';
     tbody.innerHTML = rows.map((r, i) => {
       let statusCell, timeCell, actionsCell, previstoCell;
-      const tag = r.type === 'maker' ? 'MAKER' : 'PRINCIPAL';
+      const tag = r.type === 'service' ? 'SERVICE' : (r.type === 'maker' ? 'MAKER' : 'PRINCIPAL');
       const joinedCell = r.joinedAt ? fmtTime(r.joinedAt) : '&mdash;';
-      const isMine = myCharacterIds.includes(r.characterId);
+      const isMine = entryIsMine(r, user);
 
       if(r.kind === 'active'){
         statusCell = '<span class="chip cacando">&#9876;&#65039; CACANDO</span>';
@@ -398,8 +401,7 @@ async function openJoinModal(){
   const user = await belobraGetUser();
   if(!user){ belobraSignInDiscord(); return; }
 
-  const allChars = await belobraGetMyCharacters();
-  myVerifiedCharacters = allChars.filter(c => c.verified);
+  myVerifiedCharacters = await belobraGetMyQueueCharacterOptions();
 
   const area = document.getElementById('modal-char-area');
   const confirmBtn = document.getElementById('modal-confirm-btn');
@@ -415,6 +417,7 @@ async function openJoinModal(){
     return;
   }
 
+  selectedServicePermissionId = null;
   const availability = await belobraGetCharacterAvailability(myVerifiedCharacters.map(c => c.id));
 
   const myRole = await belobraGetMyRole();
@@ -427,6 +430,7 @@ async function openJoinModal(){
     return a && !a.busy && !a.cooldownUntil;
   });
   selectedCharacterId = firstAvailable ? firstAvailable.id : null;
+  selectedServicePermissionId = firstAvailable ? (firstAvailable.servicePermissionId || null) : null;
 
   confirmBtn.disabled = !selectedCharacterId;
   area.innerHTML = `
@@ -447,9 +451,9 @@ async function openJoinModal(){
       }
 
       return `
-        <label class="char-option ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" ${disabled ? '' : `onclick="selectChar(${c.id})"`}>
+        <label class="char-option ${isSelected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" ${disabled ? '' : `onclick="selectChar(${c.id}, ${c.servicePermissionId ? `'${c.servicePermissionId}'` : 'null'})"`}>
           <input type="radio" name="char-radio" value="${c.id}" ${isSelected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
-          <span>${escapeHtml(c.name)} <span class="muted">(${c.type === 'main' ? 'Principal' : 'Maker'})</span>${noteHtml}</span>
+          <span>${escapeHtml(c.name)} <span class="muted">(${c.type === 'service' ? 'Service' : (c.type === 'main' ? 'Principal' : 'Maker')})</span>${noteHtml}</span>
         </label>
       `;
     }).join('')}
@@ -477,8 +481,9 @@ function startCooldownTicker(){
   }, 1000);
 }
 
-function selectChar(id){
+function selectChar(id, servicePermissionId = null){
   selectedCharacterId = id;
+  selectedServicePermissionId = servicePermissionId;
   document.querySelectorAll('.char-option').forEach(el => el.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
   document.getElementById('modal-confirm-btn').disabled = false;
@@ -493,7 +498,7 @@ async function confirmJoin(){
   if(!selectedCharacterId) return;
   const durationMin = parseInt(document.getElementById('input-duration').value, 10);
   try{
-    await belobraJoinRespawnQueue(respawnId, selectedCharacterId, durationMin);
+    await belobraJoinRespawnQueue(respawnId, selectedCharacterId, durationMin, selectedServicePermissionId);
     closeJoinModal();
     await belobraTickRespawnQueue(respawnId);
     render();

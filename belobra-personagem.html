@@ -108,12 +108,16 @@
 <script src="belobra-app.js"></script>
 <script>
 let currentType = 'main';
+let servicePermissions = [];
+let serviceInvite = null;
+let currentUserId = null;
 let myCharacters = [];
 
 async function boot(){
   const user = await belobraGetUser();
   const area = document.getElementById('app-area');
 
+  currentUserId = user ? user.id : null;
   if(!user){
     area.innerHTML = `
       <div class="card">
@@ -127,6 +131,7 @@ async function boot(){
   }
 
   myCharacters = await belobraGetMyCharacters();
+  try { servicePermissions = await belobraGetMyServicePermissions(); } catch(e) { servicePermissions = []; }
   renderCard();
 }
 
@@ -137,6 +142,7 @@ function getChar(type){
 function renderCard(){
   const area = document.getElementById('app-area');
   const char = getChar(currentType);
+  if(currentType === 'service'){ renderServiceCard(); return; }
 
   area.innerHTML = `
     <div class="card">
@@ -146,6 +152,7 @@ function renderCard(){
       <div class="tabs">
         <button class="${currentType==='main'?'active':''}" onclick="switchTab('main')">&#128100; Principal</button>
         <button class="${currentType==='maker'?'active':''}" onclick="switchTab('maker')">&#128295; Maker</button>
+        <button class="${currentType==='service'?'active':''}" onclick="switchTab('service')">&#128279; Service</button>
       </div>
 
       <div class="field-label">
@@ -180,6 +187,90 @@ function renderCard(){
 function switchTab(type){
   currentType = type;
   renderCard();
+}
+
+function renderServiceCard(){
+  const area = document.getElementById('app-area');
+  const owned = myCharacters.filter(c => c.verified && ['main','maker'].includes(c.type));
+  const incoming = servicePermissions.filter(p => p.grantee_profile_id);
+  const outgoing = servicePermissions.filter(p => p.owner_profile_id);
+  area.innerHTML = `
+    <div class="card">
+      <h1>Autorizações de <span class="accent">Service</span></h1>
+      <div class="sub">Um Service só pode usar seu personagem depois que você gerar um convite e a outra conta aceitar o código logada no próprio Discord. Nunca autorize alguém apenas por nome.</div>
+
+      <div class="code-box" style="border-style:solid;border-color:rgba(47,191,135,0.35);">
+        <p><b>Você vai fazer Service para alguém?</b><br>Escolha um personagem verificado e gere um convite de uso. O código é temporário e pode ser revogado.</p>
+        <select id="service-owner-char" style="width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:12px;border-radius:8px;margin-top:12px;">
+          <option value="">Selecione seu personagem</option>
+          ${owned.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${c.type === 'maker' ? 'Maker' : 'Principal'})</option>`).join('')}
+        </select>
+        <button class="btn-main" style="margin-top:12px;" onclick="createServiceInvite()">Gerar convite de Service</button>
+        ${serviceInvite ? `<div class="code" style="margin-top:14px;">${escapeHtml(serviceInvite.invite_code || '')}</div><p>Envie este código para a pessoa. Ela deve entrar no site com o Discord dela e aceitar na aba Service. Validade: 7 dias.</p>` : ''}
+      </div>
+
+      <div class="code-box">
+        <p><b>Você recebeu um convite?</b><br>Cole o código enviado pelo dono do personagem. Ele será vinculado à sua conta Discord atual.</p>
+        <input id="service-invite-code" type="text" maxlength="10" placeholder="Ex: A1B2C3D4E5" style="width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:12px;border-radius:8px;margin-top:12px;text-transform:uppercase;">
+        <button class="btn-main" style="margin-top:12px;" onclick="acceptServiceInvite()">Aceitar convite</button>
+      </div>
+
+      <div style="text-align:left;margin-top:18px;">
+        <h3 style="font-size:15px;margin-bottom:10px;">Autorizações da minha conta</h3>
+        ${servicePermissions.length ? servicePermissions.map(p => {
+          const isOwner = p.owner_profile_id === currentUserId;
+          const status = p.status === 'active' ? 'Ativo' : (p.status === 'pending' ? 'Aguardando aceite' : p.status === 'revoked' ? 'Revogado' : 'Expirado');
+          return `<div style="background:var(--pill-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;font-size:12px;">
+            <b>${escapeHtml(p.character_name || '')}</b> — ${isOwner ? 'convite criado' : 'Service autorizado'}<br>
+            <span style="color:var(--text-secondary);">${status}${p.invite_code ? ' · código ' + escapeHtml(p.invite_code) : ''}</span>
+            ${(p.status === 'active' || p.status === 'pending') ? `<button class="btn-secondary" style="margin-top:8px;" onclick="revokeService('${p.permission_id}')">Revogar autorização</button>` : ''}
+          </div>`;
+        }).join('') : '<p style="color:var(--text-secondary);font-size:13px;">Nenhuma autorização Service registrada.</p>'}
+      </div>
+      <div class="status-msg" id="service-status"></div>
+    </div>`;
+}
+
+function escapeHtml(value){
+  const div = document.createElement('div');
+  div.textContent = value == null ? '' : String(value);
+  return div.innerHTML;
+}
+
+async function createServiceInvite(){
+  const msg = document.getElementById('service-status');
+  const id = document.getElementById('service-owner-char').value;
+  if(!id){ msg.textContent = 'Selecione um personagem verificado.'; msg.className = 'status-msg fail'; return; }
+  try{
+    serviceInvite = await belobraCreateServiceInvite(id);
+    servicePermissions = await belobraGetMyServicePermissions();
+    renderServiceCard();
+    document.getElementById('service-status').textContent = 'Convite criado. Envie o código para a pessoa autorizada.';
+    document.getElementById('service-status').className = 'status-msg ok';
+  }catch(e){ msg.textContent = 'Não foi possível criar o convite: ' + e.message; msg.className = 'status-msg fail'; }
+}
+
+async function acceptServiceInvite(){
+  const msg = document.getElementById('service-status');
+  const input = document.getElementById('service-invite-code');
+  const code = (input.value || '').trim().toUpperCase();
+  if(!code){ msg.textContent = 'Cole o código do convite.'; msg.className = 'status-msg fail'; return; }
+  try{
+    await belobraAcceptServiceInvite(code);
+    servicePermissions = await belobraGetMyServicePermissions();
+    renderServiceCard();
+    document.getElementById('service-status').textContent = 'Convite aceito. O personagem aparecerá como Service ao entrar em uma hunt.';
+    document.getElementById('service-status').className = 'status-msg ok';
+  }catch(e){ msg.textContent = 'Não foi possível aceitar o convite: ' + e.message; msg.className = 'status-msg fail'; }
+}
+
+async function revokeService(permissionId){
+  if(!confirm('Revogar esta autorização Service? A pessoa não poderá usar o personagem novamente.')) return;
+  try{
+    await belobraRevokeServicePermission(permissionId);
+    servicePermissions = await belobraGetMyServicePermissions();
+    renderServiceCard();
+  }catch(e){ alert('Não foi possível revogar: ' + e.message); }
 }
 
 function updateCount(){
