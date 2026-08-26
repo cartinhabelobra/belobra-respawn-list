@@ -530,7 +530,16 @@ async function reportAfk(entryId){
     await belobraReportAfk(entryId);
     render();
   }catch(e){
-    alert(e.message);
+    let msg = e.message || 'Não foi possível reportar AFK.';
+    if(msg.includes('REPORT_AFK_COOLDOWN') || msg.includes('uma vez por hora')){
+      msg = 'Você já fez um Report AFK recentemente. Aguarde uma hora para reportar novamente.';
+    } else if(msg.includes('AFK_JA_REPORTADO')){
+      msg = 'Este jogador já está em um desafio de presença.';
+    } else if(msg.includes('APENAS_PROXIMO_DA_FILA')){
+      msg = 'Somente o próximo jogador da fila pode reportar AFK nesta hunt.';
+    }
+    alert(msg);
+    render();
   }
 }
 async function confirmPresence(entryId){
