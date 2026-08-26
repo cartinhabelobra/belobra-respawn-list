@@ -153,7 +153,7 @@ async function belobraSaveCharacter(name, type){
 
 // Chama a Edge Function que confere o comentario do personagem no tibia.com
 async function belobraVerifyCharacter(characterId){
-  const { data, error } = await supabaseClient.functions.invoke('swift-responder', {
+  const { data, error } = await supabaseClient.functions.invoke('verify-character', {
     body: { character_id: characterId }
   });
   if(error) throw error;
