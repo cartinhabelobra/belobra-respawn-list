@@ -3,8 +3,8 @@
 // Inclua este arquivo em toda pagina, depois do CDN do supabase-js
 // ============================================================
 
-const SUPABASE_URL = "https://uenrrdydgvssjlwbasbn.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlbnJyZHlkZ3Zzc2psd2Jhc2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU3Mzg2MzgsImV4cCI6MjEwMTMxNDYzOH0.YJ3VqrZuM4Fw0IIGgmwRgeI1kRTR1DbMQ_V2VPlAkHI";
+const SUPABASE_URL = "https://dfbuvkgnczgdhfcgvxjv.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmYnV2a2duY3pnZGhmY2d2eGp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2OTM3NjUsImV4cCI6MjEwMzI2OTc2NX0.4z9m9sLNfXlxSCR9VcwaZGsfH_-kPD7N8Z7Ee5T9Hs0";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
