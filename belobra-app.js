@@ -649,3 +649,18 @@ async function belobraExpireClaims(){
  const {error}=await supabaseClient.rpc('expire_claims'); if(error) console.warn('Claim tick',error);
 }
 
+async function belobraCheckGuildDaily(){
+  const u=await belobraGetUser();
+  if(!u)return {skipped:true};
+  const {data:chars,error}=await supabaseClient.from('characters').select('id,verified,guild_checked_at').eq('profile_id',u.id).eq('verified',true);
+  if(error)throw error;
+  const now=Date.now();
+  const due=(chars||[]).filter(c=>!c.guild_checked_at || now-new Date(c.guild_checked_at).getTime()>=86400000);
+  const results=[];
+  for(const c of due){
+    const r=await supabaseClient.functions.invoke('check-guild',{body:{character_id:c.id}});
+    if(r.error){results.push({id:c.id,ok:false,error:r.error.message});continue}
+    results.push(r.data);
+  }
+  return {checked:results};
+}
