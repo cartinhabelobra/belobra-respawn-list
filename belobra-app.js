@@ -1,5 +1,5 @@
-﻿// ============================================================
-// BELOBRA RESPAWN LIST â€” Conexao com Supabase
+// ============================================================
+// BELOBRA RESPAWN LIST — Conexao com Supabase
 // Inclua este arquivo em toda pagina, depois do CDN do supabase-js
 // ============================================================
 
@@ -275,7 +275,7 @@ async function belobraLeaveQueueEntry(entryId){
   if(error) throw error;
 }
 
-// Todas as filas de uma vez (usado na lista principal, pra mostrar status/contagem/quem esta caÃ§ando em cada card)
+// Todas as filas de uma vez (usado na lista principal, pra mostrar status/contagem/quem esta caçando em cada card)
 async function belobraLoadAllQueueStatus(){
   const { data, error } = await supabaseClient
     .from('queue_entries')
@@ -364,7 +364,7 @@ async function belobraGetCharacterAvailability(characterIds){
 }
 
 // Busca a entrada de fila/hunt ativa do usuario atual, em qualquer respawn
-// (Main ou Maker) â€” usada pra mostrar o bloco fixo "voce esta aqui" na home
+// (Main ou Maker) — usada pra mostrar o bloco fixo "voce esta aqui" na home
 async function belobraGetMyActiveEntry(){
   const user = await belobraGetUser();
   if(!user) return null;
@@ -448,7 +448,7 @@ async function belobraUploadTicketAttachment(file){
 }
 
 // ============================================================
-// Tickets â€” jogador
+// Tickets — jogador
 // ============================================================
 async function belobraGetMyTickets(){
   const user = await belobraGetUser();
@@ -490,7 +490,7 @@ async function belobraReportAfk(targetEntryId){
   if(error) throw error;
 }
 
-// Chamado pelo proprio caÃ§ador pra provar que esta la
+// Chamado pelo proprio caçador pra provar que esta la
 async function belobraConfirmAfkPresence(entryId){
   const { error } = await supabaseClient.rpc('confirm_afk_presence', { entry_id: entryId });
   if(error) throw error;
@@ -572,7 +572,7 @@ async function belobraUnbanProfile(profileId, keepStage){
 }
 
 // ============================================================
-// Tickets â€” staff (admin/moderador)
+// Tickets — staff (admin/moderador)
 // ============================================================
 async function belobraGetAllTickets(){
   const { data, error } = await supabaseClient
@@ -626,7 +626,7 @@ async function belobraSendTicketMessage(ticketId, message, isStaff){
     });
   if(error) throw error;
 }
-// CLAIM â€” guild dominante e administrador autorizado
+// CLAIM — guild dominante e administrador autorizado
 async function belobraGetClaimEligibleCharacters(){
  const chars=await belobraGetMyCharacters();
  const user=await belobraGetUser();
@@ -664,3 +664,4 @@ async function belobraCheckGuildDaily(){
   }
   return {checked:results};
 }
+
