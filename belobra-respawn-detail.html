@@ -292,7 +292,7 @@ async function render(){
   }
 
   const banner = document.getElementById('siren-banner');
-  if(q.calling){
+  if(q.calling && entryIsMine(q.calling, user)){
     const callKey = q.calling.id + '-' + q.calling.deadline;
     if(sirenPlayedFor !== callKey){
       playSiren();
