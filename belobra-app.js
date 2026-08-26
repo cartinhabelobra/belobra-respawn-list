@@ -664,4 +664,3 @@ async function belobraCheckGuildDaily(){
   }
   return {checked:results};
 }
-

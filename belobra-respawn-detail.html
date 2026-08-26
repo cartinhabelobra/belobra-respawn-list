@@ -277,7 +277,7 @@ async function render(){
 
   const user = await belobraGetUser();
   if(!user){
-    joinBtn.textContent = 'Entrar com Discord pra ca?ar';
+    joinBtn.textContent = 'Entrar com Discord pra caçar';
     joinBtn.classList.add('discord');
     joinBtn.onclick = belobraSignInDiscord;
     joinBtn.disabled = false;
@@ -296,7 +296,7 @@ async function render(){
       sirenPlayedFor = callKey;
     }
     banner.classList.add('show');
-    document.getElementById('siren-text').innerHTML = 'Chegou a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando Confirma??o...';
+    document.getElementById('siren-text').innerHTML = 'Chegou a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando Confirmação...';
   } else if(q.active && q.active.afkChallengeDeadline && myCharacterIds.includes(q.active.characterId)){
     const afkKey = 'afk-' + q.active.id + '-' + q.active.afkChallengeDeadline;
     if(sirenPlayedFor !== afkKey){
@@ -439,7 +439,7 @@ async function openJoinModal(){
 
       if(a.busy){
         const withWho = (a.busyWith && a.busyWith !== c.name) ? ` (${escapeHtml(a.busyWith)} esta em uso)` : '';
-        noteHtml = `<span class="char-note busy">Sua conta ja esta em outra fila ou ca?ando${withWho}</span>`;
+        noteHtml = `<span class="char-note busy">Sua conta ja esta em outra fila ou caçando${withWho}</span>`;
         disabled = true;
       } else if(a.cooldownUntil){
         noteHtml = `<span class="char-note cooldown" data-until="${a.cooldownUntil}">Em cooldown</span>`;
@@ -506,7 +506,7 @@ async function confirmJoin(){
       const date = new Date(dateStr);
       msg = `Sua conta esta banida do sistema de filas ate ${date.toLocaleString('pt-BR')}. Se acha que isso e um engano, abra um ticket de revisao na Central de Suporte.`;
     } else if(msg.includes('ja esta em uma fila')){
-      msg = 'Sua conta (Main ou Maker) ja esta em outra fila ou ca?ando em outro respawn agora.';
+      msg = 'Sua conta (Main ou Maker) ja esta em outra fila ou caçando em outro respawn agora.';
     } else if(msg.includes('cooldown')){
       msg = 'Sua conta ainda esta de cooldown apos sair de uma fila/hunt recentemente. Aguarde e tente de novo.';
     }
@@ -550,11 +550,5 @@ boot();
 
 </body>
 </html>
-<script src=" belobra-claim-ui.js\></script>
-
-
-
-<script src=belobra-claim-ui.js></script>
-<script>belobraCheckGuildDaily().catch(function(e){console.warn(" Guild check\,e)});</script>
-
-
+<script src="belobra-claim-ui.js"></script>
+<script>belobraCheckGuildDaily().catch(function(e){console.warn("Guild check", e)});</script>
