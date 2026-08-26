@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Belobra Respawn List - Estatísticas</title>
+<title>Belobra Respawn List - Estat?sticas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root{
@@ -203,7 +203,7 @@
     <a href="belobra-respawn-list.html">Respawns</a>
     <a href="belobra-regras.html">Regras</a>
     <a href="belobra-guias.html">Guias</a>
-    <a href="belobra-estatisticas.html" class="current">Estatísticas</a>
+    <a href="belobra-estatisticas.html" class="current">Estat?sticas</a>
     <a href="https://discord.gg/EWehENtQxP" target="_blank" rel="noopener">Discord</a>
     <a href="belobra-apoie.html" class="support">Apoie o Projeto</a>
   </nav>
@@ -212,16 +212,16 @@
 
 <main>
   <div class="page-head">
-    <h1>Estatísticas da Comunidade</h1>
-    <p>Acompanhe a atividade dos caçadores, descubra os horários de pico e veja os recordes do servidor assim que a comunidade começar a usar o sistema.</p>
+    <h1>Estat?sticas da Comunidade</h1>
+    <p>Acompanhe a atividade dos ca?adores, descubra os hor?rios de pico e veja os recordes do servidor assim que a comunidade come?ar a usar o sistema.</p>
   </div>
 
   <div class="search-box">
     <div class="left">
       <div class="icon">&#128269;</div>
       <div>
-        <h3>Estatísticas individuais de jogadores</h3>
-        <p>Procure pelo nome de qualquer personagem para ver as estatísticas pessoais.</p>
+        <h3>Estat?sticas individuais de jogadores</h3>
+        <p>Procure pelo nome de qualquer personagem para ver as estat?sticas pessoais.</p>
       </div>
     </div>
     <div style="display:flex;gap:8px;">
@@ -238,19 +238,19 @@
       <div class="stat-sub">desde o lancamento</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">HORAS CAÇADAS</div>
+      <div class="stat-label">HORAS CA?ADAS</div>
       <div class="stat-value" id="stat-hours">0<span class="unit">h</span></div>
       <div class="stat-sub">tempo acumulado em hunts</div>
     </div>
     <div class="stat-card">
-      <div class="stat-label">ESPERA MÉDIA</div>
+      <div class="stat-label">ESPERA M?DIA</div>
       <div class="stat-value" id="stat-wait">&mdash;</div>
       <div class="stat-sub">antes de aceitar a vaga</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">JOGADORES ATIVOS</div>
       <div class="stat-value" id="stat-active">0</div>
-      <div class="stat-sub">últimos 30 dias</div>
+      <div class="stat-sub">?ltimos 30 dias</div>
     </div>
   </div>
 
@@ -258,24 +258,24 @@
     <div class="left">
       <div class="icon" style="width:34px;height:34px;border-radius:50%;background:var(--pill-bg);display:flex;align-items:center;justify-content:center;">&#128161;</div>
       <div>
-        <h3>Como essas metricas são calculadas?</h3>
-        <p>Clique para entender as regras e a lógica por tras de cada valor apresentado.</p>
+        <h3>Como essas metricas s?o calculadas?</h3>
+        <p>Clique para entender as regras e a l?gica por tras de cada valor apresentado.</p>
       </div>
     </div>
     <button id="explain-btn">Mostrar explicacao &#9660;</button>
   </div>
   <div class="explain" id="explain">
-    <p><b style="color:var(--text-primary)">Total de reservas:</b> soma de todas as vezes que alguém entrou numa fila e confirmou uma hunt, desde o lancamento do site.</p>
-    <p><b style="color:var(--text-primary)">Horas caçadas:</b> soma do tempo real de hunt de todos os jogadores, calculado a partir do momento da confirmação até o encerramento.</p>
-    <p><b style="color:var(--text-primary)">Espera média:</b> média do tempo entre entrar na fila e a vaga ser aceita, considerando os últimos 30 dias.</p>
-    <p><b style="color:var(--text-primary)">Jogadores ativos:</b> personagens distintos que finalizaram pelo menos uma hunt nos últimos 30 dias.</p>
-    <p style="margin-top:10px;">Todos os números comecam zerados e são atualizados automaticamente conforme a comunidade usa o sistema.</p>
+    <p><b style="color:var(--text-primary)">Total de reservas:</b> soma de todas as vezes que algu?m entrou numa fila e confirmou uma hunt, desde o lancamento do site.</p>
+    <p><b style="color:var(--text-primary)">Horas ca?adas:</b> soma do tempo real de hunt de todos os jogadores, calculado a partir do momento da confirma??o at? o encerramento.</p>
+    <p><b style="color:var(--text-primary)">Espera m?dia:</b> m?dia do tempo entre entrar na fila e a vaga ser aceita, considerando os ?ltimos 30 dias.</p>
+    <p><b style="color:var(--text-primary)">Jogadores ativos:</b> personagens distintos que finalizaram pelo menos uma hunt nos ?ltimos 30 dias.</p>
+    <p style="margin-top:10px;">Todos os n?meros comecam zerados e s?o atualizados automaticamente conforme a comunidade usa o sistema.</p>
   </div>
 
   <div class="panel">
     <div class="panel-head">
-      <h2>&#127942; Top Caçadores da Comunidade</h2>
-      <div class="tabs" data-group="top-caçadores">
+      <h2>&#127942; Top Ca?adores da Comunidade</h2>
+      <div class="tabs" data-group="top-ca?adores">
         <button onclick="selectTab(this)">Semana</button>
         <button onclick="selectTab(this)">Mes</button>
         <button class="active" onclick="selectTab(this)">Historico</button>
@@ -284,7 +284,7 @@
     <div id="top-cacadores-content">
       <div class="empty-state">
         <div class="big-icon">&#127942;</div>
-        <p>Ainda não há caçadores suficientes pra montar o ranking.</p>
+        <p>Ainda n?o h? ca?adores suficientes pra montar o ranking.</p>
         <p class="small">Assim que os jogadores comecarem a registrar hunts, a tabela aparece aqui automaticamente.</p>
       </div>
     </div>
@@ -297,7 +297,7 @@
     <div id="respawns-cobicados-content">
       <div class="empty-state">
         <div class="big-icon">&#128293;</div>
-        <p>Ainda não há reservas suficientes pra identificar os respawns mais disputados.</p>
+        <p>Ainda n?o h? reservas suficientes pra identificar os respawns mais disputados.</p>
         <p class="small">Esse ranking se preenche sozinho conforme os respawns forem sendo usados.</p>
       </div>
     </div>
