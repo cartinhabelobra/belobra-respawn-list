@@ -1,5 +1,5 @@
-// ============================================================
-// BELOBRA RESPAWN LIST — Conexao com Supabase
+﻿// ============================================================
+// BELOBRA RESPAWN LIST â€” Conexao com Supabase
 // Inclua este arquivo em toda pagina, depois do CDN do supabase-js
 // ============================================================
 
@@ -275,7 +275,7 @@ async function belobraLeaveQueueEntry(entryId){
   if(error) throw error;
 }
 
-// Todas as filas de uma vez (usado na lista principal, pra mostrar status/contagem/quem esta caçando em cada card)
+// Todas as filas de uma vez (usado na lista principal, pra mostrar status/contagem/quem esta caÃ§ando em cada card)
 async function belobraLoadAllQueueStatus(){
   const { data, error } = await supabaseClient
     .from('queue_entries')
@@ -364,7 +364,7 @@ async function belobraGetCharacterAvailability(characterIds){
 }
 
 // Busca a entrada de fila/hunt ativa do usuario atual, em qualquer respawn
-// (Main ou Maker) — usada pra mostrar o bloco fixo "voce esta aqui" na home
+// (Main ou Maker) â€” usada pra mostrar o bloco fixo "voce esta aqui" na home
 async function belobraGetMyActiveEntry(){
   const user = await belobraGetUser();
   if(!user) return null;
@@ -448,7 +448,7 @@ async function belobraUploadTicketAttachment(file){
 }
 
 // ============================================================
-// Tickets — jogador
+// Tickets â€” jogador
 // ============================================================
 async function belobraGetMyTickets(){
   const user = await belobraGetUser();
@@ -490,7 +490,7 @@ async function belobraReportAfk(targetEntryId){
   if(error) throw error;
 }
 
-// Chamado pelo proprio caçador pra provar que esta la
+// Chamado pelo proprio caÃ§ador pra provar que esta la
 async function belobraConfirmAfkPresence(entryId){
   const { error } = await supabaseClient.rpc('confirm_afk_presence', { entry_id: entryId });
   if(error) throw error;
@@ -572,7 +572,7 @@ async function belobraUnbanProfile(profileId, keepStage){
 }
 
 // ============================================================
-// Tickets — staff (admin/moderador)
+// Tickets â€” staff (admin/moderador)
 // ============================================================
 async function belobraGetAllTickets(){
   const { data, error } = await supabaseClient
@@ -626,3 +626,26 @@ async function belobraSendTicketMessage(ticketId, message, isStaff){
     });
   if(error) throw error;
 }
+// CLAIM â€” guild dominante e administrador autorizado
+async function belobraGetClaimEligibleCharacters(){
+ const chars=await belobraGetMyCharacters();
+ const user=await belobraGetUser();
+ const admin=user && (user.user_metadata?.name==='Mico Lokoo'||user.user_metadata?.full_name==='Mico Lokoo'||user.user_metadata?.custom_claims?.global_name==='Mico Lokoo');
+ return chars.filter(c=>c.verified && (admin || ['rangers','rangers academy'].includes(String(c.guild_name||'').trim().toLowerCase())));
+}
+async function belobraCreateClaim(activeEntryId,characterId){
+ const {data,error}=await supabaseClient.rpc('create_claim',{p_active_entry_id:activeEntryId,p_claimer_character_id:characterId});
+ if(error) throw error; return data;
+}
+async function belobraGetOpenClaims(respawnId){
+ const {data,error}=await supabaseClient.from('claim_requests').select('id,respawn_id,active_entry_id,claimer_character_id,claimer_profile_id,status,created_at,response_deadline').eq('respawn_id',respawnId).eq('status','pending');
+ if(error) throw error; return data||[];
+}
+async function belobraResolveClaim(claimId,decision){
+ const {error}=await supabaseClient.rpc('resolve_claim',{p_claim_id:claimId,p_decision:decision});
+ if(error) throw error;
+}
+async function belobraExpireClaims(){
+ const {error}=await supabaseClient.rpc('expire_claims'); if(error) console.warn('Claim tick',error);
+}
+
