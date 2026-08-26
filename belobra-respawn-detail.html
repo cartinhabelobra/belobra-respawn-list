@@ -296,7 +296,7 @@ async function render(){
       sirenPlayedFor = callKey;
     }
     banner.classList.add('show');
-    document.getElementById('siren-text').innerHTML = 'Ã‰ a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando confirmacao...';
+    document.getElementById('siren-text').innerHTML = 'Chegou a vez de <b>' + escapeHtml(q.calling.name) + '</b>! Aguardando Confirmação...';
   } else if(q.active && q.active.afkChallengeDeadline && myCharacterIds.includes(q.active.characterId)){
     const afkKey = 'afk-' + q.active.id + '-' + q.active.afkChallengeDeadline;
     if(sirenPlayedFor !== afkKey){
@@ -556,3 +556,5 @@ boot();
 
 <script src=belobra-claim-ui.js></script>
 <script>belobraCheckGuildDaily().catch(function(e){console.warn(" Guild check\,e)});</script>
+
+
