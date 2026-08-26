@@ -200,7 +200,7 @@ function renderServiceCard(){
       <div class="sub">Um Service só pode usar seu personagem depois que você gerar um convite e a outra conta aceitar o código logada no próprio Discord. Nunca autorize alguém apenas por nome.</div>
 
       <div class="code-box" style="border-style:solid;border-color:rgba(47,191,135,0.35);">
-        <p><b>Você vai fazer Service para alguém?</b><br>Escolha um personagem verificado e gere um convite de uso. O código é temporário e pode ser revogado.</p>
+        <p><b>Alguém vai fazer Service para você?</b><br>Escolha seu personagem verificado e gere um convite. A pessoa que fará o service deverá aceitar este código no site.</p>
         <select id="service-owner-char" style="width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:12px;border-radius:8px;margin-top:12px;">
           <option value="">Selecione seu personagem</option>
           ${owned.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${c.type === 'maker' ? 'Maker' : 'Principal'})</option>`).join('')}
@@ -210,7 +210,7 @@ function renderServiceCard(){
       </div>
 
       <div class="code-box">
-        <p><b>Você recebeu um convite?</b><br>Cole o código enviado pelo dono do personagem. Ele será vinculado à sua conta Discord atual.</p>
+        <p><b>Você vai fazer Service para alguém?</b><br>Cole o código enviado pelo dono do personagem. O personagem dele aparecerá para você ao entrar em uma hunt.</p>
         <input id="service-invite-code" type="text" maxlength="10" placeholder="Ex: A1B2C3D4E5" style="width:100%;background:var(--pill-bg);border:1px solid var(--border);color:var(--text-primary);padding:12px;border-radius:8px;margin-top:12px;text-transform:uppercase;">
         <button class="btn-main" style="margin-top:12px;" onclick="acceptServiceInvite()">Aceitar convite</button>
       </div>
