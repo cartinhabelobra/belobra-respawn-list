@@ -316,10 +316,26 @@ async function createClaimFromUi(activeEntryId){
     await openAfkModal({ title: 'Claim enviado', message: 'O jogador que está na hunt recebeu o alerta e deverá responder ao Claim.', confirmText: 'Entendi' });
   }catch(e){
     const raw = e?.message || '';
-    const message = raw.includes('JA_EXISTE_CLAIM_NESSA_HUNT')
-      ? 'Já existe um Claim pendente para esta hunt. O jogador já foi avisado; aguarde a resposta ou o fim da contagem de 10 minutos.'
-      : raw || 'Tente novamente.';
-    await openAfkModal({ title: 'Claim já em andamento', message, error: true });
+    const cooldownMatch = raw.match(/CLAIM_COOLDOWN_ATIVO:([0-9.]+)/);
+    let title = 'Claim já em andamento';
+    let message = 'Tente novamente.';
+    if(cooldownMatch){
+      const until = Number(cooldownMatch[1]) * 1000;
+      const remaining = Math.max(0, until - Date.now());
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+      title = 'Cooldown de Claim';
+      message = 'Você já usou Claim nesta hunt. Aguarde ' + minutes + 'm ' + String(seconds).padStart(2, '0') + 's para usar novamente.';
+    }else if(raw.includes('JA_EXISTE_CLAIM_NESSA_HUNT')){
+      message = 'Já existe um Claim pendente para esta hunt. O jogador já foi avisado; aguarde a resposta ou o fim da contagem de 10 minutos.';
+    }else if(raw.includes('NAO_PODE_DAR_CLAIM_NA_PROPRIA_HUNT')){
+      message = 'Você não pode dar Claim na própria hunt.';
+    }else if(raw.includes('PERSONAGEM_CLAIMER_JA_ESTA_EM_HUNT')){
+      message = 'O personagem escolhido já está caçando em outra hunt.';
+    }else if(raw){
+      message = raw;
+    }
+    await openAfkModal({ title, message, error: true });
   }finally{
     window.belobraClaimSending = false;
   }
