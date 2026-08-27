@@ -646,10 +646,21 @@ async function belobraSendTicketMessage(ticketId, message, isStaff){
 }
 // CLAIM — guild dominante e administrador autorizado
 async function belobraGetClaimEligibleCharacters(){
- const chars=await belobraGetMyCharacters();
- const user=await belobraGetUser();
- const admin=user && (user.user_metadata?.name==='Mico Lokoo'||user.user_metadata?.full_name==='Mico Lokoo'||user.user_metadata?.custom_claims?.global_name==='Mico Lokoo');
- return chars.filter(c=>c.verified && (admin || ['rangers','rangers academy'].includes(String(c.guild_name||'').trim().toLowerCase())));
+  const ownCharacters = await belobraGetMyCharacters();
+  const role = await belobraGetMyRole();
+  let serviceCharacters = [];
+  if(role === 'admin'){
+    try { serviceCharacters = await belobraGetMyServiceCharacters(); }
+    catch(e){ console.warn('Service Claim ainda nao configurado:', e.message); }
+  }
+  const characters = role === 'admin'
+    ? ownCharacters.concat(serviceCharacters)
+    : ownCharacters;
+  return characters.filter(c => {
+    if(!c.verified) return false;
+    if(role === 'admin') return true;
+    return ['rangers','rangers academy'].includes(String(c.guild_name || '').trim().toLowerCase());
+  });
 }
 async function belobraCreateClaim(activeEntryId,characterId){
  const {data,error}=await supabaseClient.rpc('create_claim',{p_active_entry_id:activeEntryId,p_claimer_character_id:characterId});
