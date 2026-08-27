@@ -84,7 +84,7 @@
   .countdown{color:var(--accent-gold);}
   .previsto{color:var(--accent-blue);font-weight:700;}
   .muted{color:var(--text-muted);}
-  .row-actions{display:flex;gap:8px;}
+  .row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
   .btn-mini{font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--pill-bg);color:var(--text-primary);cursor:pointer;}
   .btn-mini.end{color:var(--accent-red);border-color:rgba(226,87,76,0.4);}
   .btn-mini.accept{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;border:none;}
@@ -94,7 +94,8 @@
 
   .siren-banner{display:none;align-items:center;gap:12px;background:rgba(224,169,74,0.1);border:1px solid rgba(224,169,74,0.4);border-radius:12px;padding:14px 20px;margin-bottom:18px;font-size:14px;}
   .siren-banner.afk-alert{background:rgba(226,87,76,0.12);border-color:rgba(226,87,76,0.5);}
-  .btn-mini.report-afk{color:var(--accent-gold);border-color:rgba(224,169,74,0.4);}
+  .btn-mini.report-afk{color:var(--accent-gold);border-color:rgba(224,169,74,0.4);min-width:82px;}
+  .btn-mini.report-ticket{display:inline-block;text-decoration:none;color:var(--accent-red);border-color:rgba(226,87,76,0.45);min-width:88px;text-align:center;}
   .btn-mini.confirm-presence{background:var(--accent-red);color:#fff;border:none;animation:pulse-afk 1.2s infinite;}
   @keyframes pulse-afk{0%,100%{opacity:1;}50%{opacity:0.6;}}
   .siren-banner.show{display:flex;}
@@ -426,9 +427,15 @@ async function render(){
         } else if(isMine){
           actionsCell = '<button class="btn-mini end" onclick="endHunt(' + r.id + ')">Encerrar Hunt</button>';
         } else if(iAmNextInLine){
-          actionsCell = canReportAfkNow
-            ? '<button class="btn-mini report-afk" onclick="reportAfk(' + r.id + ')">&#128276; Reportar AFK</button>'
-            : '<span class="muted" title="Voce ja reportou AFK ha menos de 1 hora">Reportar AFK (aguarde)</span>';
+          const ticketUrl = 'belobra-suporte.html?report_char=' + encodeURIComponent(r.characterId) +
+            '&report_char_name=' + encodeURIComponent(r.name) +
+            '&report_respawn=' + encodeURIComponent(document.getElementById('rp-title').textContent || '') +
+            '&report_respawn_id=' + encodeURIComponent(respawnId);
+          const afkAction = canReportAfkNow
+            ? '<button class="btn-mini report-afk" title="Avisa o jogador e inicia o desafio de presença" onclick="reportAfk(' + r.id + ')">&#128276; AFK</button>'
+            : '<span class="muted" title="Voce ja reportou AFK ha menos de 1 hora">AFK (aguarde)</span>';
+          actionsCell = '<div class="row-actions">' + afkAction +
+            '<a class="btn-mini report-ticket" title="Abrir um ticket para a administracao" href="' + ticketUrl + '">&#128683; Reportar</a></div>';
         } else {
           actionsCell = '<span class="muted">&mdash;</span>';
         }
