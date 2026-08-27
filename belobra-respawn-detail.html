@@ -288,7 +288,8 @@ document.addEventListener('keydown', event => {
   }
 });
 
-document.addEventListener('click', () => {
+document.addEventListener('click', (event) => {
+  if(event.target.closest('.action-menu-wrap')) return;
   document.querySelectorAll('.action-menu.show').forEach(menu => menu.classList.remove('show'));
 });
 
@@ -302,8 +303,11 @@ function toggleActionMenu(event, menuId){
 }
 
 async function createClaimFromUi(activeEntryId){
+  if(window.belobraClaimSending) return;
+  window.belobraClaimSending = true;
   const eligible = window.belobraClaimEligibleCharacters || [];
   if(!eligible.length){
+    window.belobraClaimSending = false;
     await openAfkModal({ title: 'Claim indisponível', message: 'Sua conta não possui permissão para usar Claim nesta fila.', error: true });
     return;
   }
@@ -311,7 +315,13 @@ async function createClaimFromUi(activeEntryId){
     await belobraCreateClaim(activeEntryId, eligible[0].id);
     await openAfkModal({ title: 'Claim enviado', message: 'O jogador que está na hunt recebeu o alerta e deverá responder ao Claim.', confirmText: 'Entendi' });
   }catch(e){
-    await openAfkModal({ title: 'Não foi possível enviar o Claim', message: e.message || 'Tente novamente.', error: true });
+    const raw = e?.message || '';
+    const message = raw.includes('JA_EXISTE_CLAIM_NESSA_HUNT')
+      ? 'Já existe um Claim pendente para esta hunt. O jogador já foi avisado; aguarde a resposta ou o fim da contagem de 10 minutos.'
+      : raw || 'Tente novamente.';
+    await openAfkModal({ title: 'Claim já em andamento', message, error: true });
+  }finally{
+    window.belobraClaimSending = false;
   }
 }
 
@@ -460,6 +470,7 @@ async function render(){
     emptyMsg.style.display = 'block';
   } else {
     emptyMsg.style.display = 'none';
+    const openActionMenuId = document.querySelector('.action-menu.show')?.id || null;
     tbody.innerHTML = rows.map((r, i) => {
       let statusCell, timeCell, actionsCell, previstoCell;
       const tag = r.type === 'service' ? 'SERVICE' : (r.type === 'maker' ? 'MAKER' : 'PRINCIPAL');
@@ -524,6 +535,10 @@ async function render(){
         '<td>' + actionsCell + '</td>' +
         '</tr>';
     }).join('');
+    if(openActionMenuId){
+      const menuToRestore = document.getElementById(openActionMenuId);
+      if(menuToRestore) menuToRestore.classList.add('show');
+    }
   }
 }
 
