@@ -240,6 +240,9 @@ function belobraGroupQueueRows(rows){
       deadline: r.call_deadline ? new Date(r.call_deadline).getTime() : null,
       characterId: r.character_id,
       afkChallengeDeadline: r.afk_challenge_deadline ? new Date(r.afk_challenge_deadline).getTime() : null,
+      claimPriorityAt: r.claim_priority_at ? new Date(r.claim_priority_at).getTime() : null,
+      returnToQueueAfterHunt: r.return_to_queue_after_hunt === true,
+      claimReducedDuration: r.claim_reduced_duration === true,
       queuedByProfileId: r.queued_by_profile_id || null,
       servicePermissionId: r.service_permission_id || null
     };
@@ -247,14 +250,14 @@ function belobraGroupQueueRows(rows){
     else if(r.status === 'calling') calling = entry;
     else waiting.push(entry);
   });
-  waiting.sort((a,b) => a.joinedAt - b.joinedAt);
+  waiting.sort((a,b) => (a.claimPriorityAt ?? Number.POSITIVE_INFINITY) - (b.claimPriorityAt ?? Number.POSITIVE_INFINITY) || a.joinedAt - b.joinedAt);
   return { active, calling, waiting };
 }
 
 async function belobraLoadRespawnQueue(respawnId){
   const { data, error } = await supabaseClient
     .from('queue_entries')
-    .select('id, respawn_id, character_id, status, duration_min, joined_at, started_at, call_deadline, afk_challenge_deadline, queued_by_profile_id, service_permission_id, characters(name, type)')
+    .select('id, respawn_id, character_id, status, duration_min, joined_at, started_at, call_deadline, afk_challenge_deadline, claim_priority_at, return_to_queue_after_hunt, claim_reduced_duration, queued_by_profile_id, service_permission_id, characters(name, type)')
     .eq('respawn_id', respawnId)
     .order('joined_at', { ascending: true });
   if(error){ console.error(error); return { active:null, calling:null, waiting:[] }; }
@@ -340,7 +343,7 @@ async function belobraGetCharacterAvailability(characterIds){
   const loadRows = async () => {
     const { data, error } = await supabaseClient
       .from('queue_entries')
-      .select('id, character_id, respawn_id, status, duration_min, started_at, call_deadline, queued_by_profile_id, characters(name, profile_id)')
+      .select('id, character_id, respawn_id, status, duration_min, started_at, call_deadline, claim_reduced_duration, queued_by_profile_id, characters(name, profile_id)')
       .in('character_id', characterIds);
     if(error) throw error;
     return data || [];
@@ -352,7 +355,7 @@ async function belobraGetCharacterAvailability(characterIds){
   rows.forEach(r => {
     let expired = false;
     if(r.status === 'active' && r.started_at){
-      const endsAt = new Date(r.started_at).getTime() + (r.duration_min + 15) * 60000;
+      const endsAt = new Date(r.started_at).getTime() + (r.claim_reduced_duration ? r.duration_min : r.duration_min + 15) * 60000;
       if(now >= endsAt) expired = true;
     }
     if(r.status === 'calling' && r.call_deadline && now > new Date(r.call_deadline).getTime()) expired = true;
@@ -399,7 +402,7 @@ async function belobraGetMyActiveEntry(){
 
   const { data, error } = await supabaseClient
     .from('queue_entries')
-    .select('id, respawn_id, status, duration_min, started_at, call_deadline, joined_at, afk_challenge_deadline, queued_by_profile_id, service_permission_id, characters(name, type), respawns(name)')
+    .select('id, respawn_id, status, duration_min, started_at, call_deadline, joined_at, afk_challenge_deadline, claim_reduced_duration, queued_by_profile_id, service_permission_id, characters(name, type), respawns(name)')
     .eq('queued_by_profile_id', user.id)
     .limit(1)
     .maybeSingle();
@@ -415,6 +418,7 @@ async function belobraGetMyActiveEntry(){
     servicePermissionId: data.service_permission_id || null,
     status: data.status,
     durationMin: data.duration_min,
+    claimReducedDuration: data.claim_reduced_duration === true,
     startedAt: data.started_at ? new Date(data.started_at).getTime() : null,
     callDeadline: data.call_deadline ? new Date(data.call_deadline).getTime() : null,
     joinedAt: data.joined_at ? new Date(data.joined_at).getTime() : null,

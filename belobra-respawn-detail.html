@@ -466,7 +466,7 @@ async function render(){
   const tbody = document.getElementById('queue-body');
   const emptyMsg = document.getElementById('empty-msg');
 
-  const queueSignature = rows.map(r => [r.kind, r.id, r.status || '', r.characterId || '', r.startedAt || '', r.deadline || '', r.afkChallengeDeadline || ''].join(':')).join('|');
+  const queueSignature = rows.map(r => [r.kind, r.id, r.status || '', r.characterId || '', r.startedAt || '', r.deadline || '', r.afkChallengeDeadline || '', r.claimReducedDuration ? 'reduced' : 'normal'].join(':')).join('|');
   const queueNeedsRebuild = queueSignature !== lastQueueRenderSignature;
 
   if(rows.length === 0){
@@ -484,8 +484,9 @@ async function render(){
 
       if(r.kind === 'active'){
         statusCell = '<span class="chip cacando">&#9876;&#65039; CACANDO</span>';
-        const remain = (r.durationMin + 15) * 60000 - (now - r.startedAt);
-        timeCell = '<span class="timer-chip dynamic-hunt-time" data-started="' + r.startedAt + '" data-duration="' + r.durationMin + '">&#9201; ' + fmtHuntRemaining(remain) + '</span>';
+        const claimDuration = r.claimReducedDuration ? r.durationMin : r.durationMin + 15;
+        const remain = claimDuration * 60000 - (now - r.startedAt);
+        timeCell = '<span class="timer-chip dynamic-hunt-time" data-started="' + r.startedAt + '" data-duration="' + r.durationMin + '" data-reduced="' + (r.claimReducedDuration ? 'true' : 'false') + '">&#9201; ' + fmtHuntRemaining(remain) + '</span>';
         if(isMine && r.afkChallengeDeadline){
           const afkRemain = r.afkChallengeDeadline - now;
           actionsCell = '<div class="row-actions">' +
@@ -549,7 +550,8 @@ async function render(){
       tbody.querySelectorAll('.dynamic-hunt-time').forEach(el => {
         const started = Number(el.dataset.started);
         const duration = Number(el.dataset.duration);
-        el.innerHTML = '&#9201; ' + fmtHuntRemaining((duration + 15) * 60000 - (now - started));
+        const effectiveDuration = el.dataset.reduced === 'true' ? duration : duration + 15;
+        el.innerHTML = '&#9201; ' + fmtHuntRemaining(effectiveDuration * 60000 - (now - started));
       });
       tbody.querySelectorAll('.dynamic-calling-time').forEach(el => {
         el.innerHTML = '&#9201; ' + fmtCountdown(Number(el.dataset.deadline) - now);

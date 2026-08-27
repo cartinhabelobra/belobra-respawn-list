@@ -327,7 +327,8 @@ async function renderMyStatus(){
     timerHtml = `<span class="timer" style="color:var(--accent-red);">&#9201; ${m}m ${String(s).padStart(2,'0')}s restantes</span>`;
     actionBtn = `<button class="btn-leave" style="background:var(--accent-red);color:#fff;" onclick="quickConfirmPresence(${entry.id})">Confirmar presenca</button>`;
   } else if(entry.status === 'active'){
-    const endsAt = entry.startedAt + (entry.durationMin + 15) * 60000;
+    const effectiveMinutes = entry.claimReducedDuration ? entry.durationMin : entry.durationMin + 15;
+    const endsAt = entry.startedAt + effectiveMinutes * 60000;
     const remain = Math.max(0, endsAt - now);
     const m = Math.floor(remain / 60000);
     const h = Math.floor(m / 60);
