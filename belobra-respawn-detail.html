@@ -85,6 +85,21 @@
   .previsto{color:var(--accent-blue);font-weight:700;}
   .muted{color:var(--text-muted);}
   .row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .action-icon{width:36px;height:36px;padding:0;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer;background:var(--pill-bg);border:1px solid var(--border);transition:transform .15s,border-color .15s,background .15s;}
+  .action-icon:hover{transform:translateY(-1px);background:#252a36;}
+  .action-icon.report-trigger{color:var(--accent-gold);border-color:rgba(224,169,74,0.55);}
+  .action-icon.claim-trigger{color:#c19aff;border-color:rgba(155,107,255,0.7);background:rgba(155,107,255,0.12);}
+  .action-menu-wrap{position:relative;display:inline-flex;}
+  .action-menu{display:none;position:absolute;right:0;bottom:calc(100% + 9px);width:230px;padding:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 35px rgba(0,0,0,0.45);z-index:40;}
+  .action-menu.show{display:grid;gap:6px;}
+  .action-menu button,.action-menu a{width:100%;display:flex;align-items:center;gap:10px;text-align:left;text-decoration:none;padding:9px 10px;border-radius:8px;border:1px solid transparent;background:var(--pill-bg);color:var(--text-primary);font:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+  .action-menu button:hover,.action-menu a:hover{border-color:var(--border);background:#252a36;}
+  .action-menu .menu-icon{font-size:17px;width:22px;text-align:center;}
+  .action-menu .menu-copy{display:flex;flex-direction:column;gap:2px;}
+  .action-menu small{color:var(--text-secondary);font-size:10px;font-weight:400;line-height:1.25;}
+  .action-menu .menu-afk{color:var(--accent-gold);}
+  .action-menu .menu-report{color:var(--accent-red);}
+  .action-menu button:disabled{opacity:0.45;cursor:not-allowed;}
   .btn-mini{font-size:12px;font-weight:700;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--pill-bg);color:var(--text-primary);cursor:pointer;}
   .btn-mini.end{color:var(--accent-red);border-color:rgba(226,87,76,0.4);}
   .btn-mini.accept{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;border:none;}
@@ -272,6 +287,33 @@ document.addEventListener('keydown', event => {
   }
 });
 
+document.addEventListener('click', () => {
+  document.querySelectorAll('.action-menu.show').forEach(menu => menu.classList.remove('show'));
+});
+
+function toggleActionMenu(event, menuId){
+  event.stopPropagation();
+  document.querySelectorAll('.action-menu.show').forEach(menu => {
+    if(menu.id !== menuId) menu.classList.remove('show');
+  });
+  const menu = document.getElementById(menuId);
+  if(menu) menu.classList.toggle('show');
+}
+
+async function createClaimFromUi(activeEntryId){
+  const eligible = window.belobraClaimEligibleCharacters || [];
+  if(!eligible.length){
+    await openAfkModal({ title: 'Claim indisponível', message: 'Sua conta não possui permissão para usar Claim nesta fila.', error: true });
+    return;
+  }
+  try{
+    await belobraCreateClaim(activeEntryId, eligible[0].id);
+    await openAfkModal({ title: 'Claim enviado', message: 'O jogador que está na hunt recebeu o alerta e deverá responder ao Claim.', confirmText: 'Entendi' });
+  }catch(e){
+    await openAfkModal({ title: 'Não foi possível enviar o Claim', message: e.message || 'Tente novamente.', error: true });
+  }
+}
+
 async function boot(){
   if(!respawnId){
     document.getElementById('rp-title').textContent = 'Respawn nao encontrado';
@@ -283,9 +325,15 @@ async function boot(){
   document.title = 'Belobra Respawn List - ' + (respawn ? respawn.name : '');
 
   const user = await belobraGetUser();
+  window.belobraClaimEligibleCharacters = [];
   if(user){
     const allChars = await belobraGetMyCharacters();
     myCharacterIds = allChars.map(c => c.id);
+    try{
+      window.belobraClaimEligibleCharacters = await belobraGetClaimEligibleCharacters();
+    }catch(e){
+      console.warn('Elegibilidade de Claim', e);
+    }
   }
 
   await render();
@@ -397,6 +445,7 @@ async function render(){
     }
   }
 
+  const claimEligible = Array.isArray(window.belobraClaimEligibleCharacters) && window.belobraClaimEligibleCharacters.length > 0;
   const rows = [];
   if(q.active) rows.push({ kind:'active', ...q.active });
   if(q.calling) rows.push({ kind:'calling', ...q.calling });
@@ -426,18 +475,24 @@ async function render(){
             '<button class="btn-mini confirm-presence" onclick="confirmPresence(' + r.id + ')">Confirmar presenca (' + fmtCountdown(afkRemain) + ')</button></div>';
         } else if(isMine){
           actionsCell = '<button class="btn-mini end" onclick="endHunt(' + r.id + ')">Encerrar Hunt</button>';
-        } else if(iAmNextInLine){
-          const ticketUrl = 'belobra-suporte.html?report_char=' + encodeURIComponent(r.characterId) +
-            '&report_char_name=' + encodeURIComponent(r.name) +
-            '&report_respawn=' + encodeURIComponent(document.getElementById('rp-title').textContent || '') +
-            '&report_respawn_id=' + encodeURIComponent(respawnId);
-          const afkAction = canReportAfkNow
-            ? '<button class="btn-mini report-afk" title="Avisa o jogador e inicia o desafio de presença" onclick="reportAfk(' + r.id + ')">&#128276; AFK</button>'
-            : '<span class="muted" title="Voce ja reportou AFK ha menos de 1 hora">AFK (aguarde)</span>';
-          actionsCell = '<div class="row-actions">' + afkAction +
-            '<a class="btn-mini report-ticket" title="Abrir um ticket para a administracao" href="' + ticketUrl + '">&#128683; Reportar</a></div>';
         } else {
-          actionsCell = '<span class="muted">&mdash;</span>';
+          const actionParts = [];
+          if(iAmNextInLine){
+            const menuId = 'report-menu-' + r.id;
+            const ticketUrl = 'belobra-suporte.html?report_char=' + encodeURIComponent(r.characterId) +
+              '&report_char_name=' + encodeURIComponent(r.name) +
+              '&report_respawn=' + encodeURIComponent(document.getElementById('rp-title').textContent || '') +
+              '&report_respawn_id=' + encodeURIComponent(respawnId);
+            const afkItem = canReportAfkNow
+              ? '<button type="button" class="menu-afk" onclick="document.getElementById(\'' + menuId + '\').classList.remove(\'show\'); reportAfk(' + r.id + ')"><span class="menu-icon">&#128276;</span><span class="menu-copy">AFK<small>Alerta imediato e desafio de presença</small></span></button>'
+              : '<button type="button" class="menu-afk" disabled><span class="menu-icon">&#128276;</span><span class="menu-copy">AFK<small>Disponível novamente em 1 hora</small></span></button>';
+            const reportItem = '<a class="menu-report" title="Abrir um ticket para a administracao" href="' + ticketUrl + '" onclick="document.getElementById(\'' + menuId + '\').classList.remove(\'show\')"><span class="menu-icon">&#128683;</span><span class="menu-copy">Reportar<small>Abrir ticket para a administração</small></span></a>';
+            actionParts.push('<div class="action-menu-wrap"><button type="button" class="action-icon report-trigger" title="AFK ou Reportar" onclick="toggleActionMenu(event, \'' + menuId + '\')">&#9650;</button><div class="action-menu" id="' + menuId + '">' + afkItem + reportItem + '</div></div>');
+          }
+          if(claimEligible){
+            actionParts.push('<button type="button" class="action-icon claim-trigger" title="Enviar Claim para o jogador que está na hunt" onclick="createClaimFromUi(' + r.id + ')">&#128081;</button>');
+          }
+          actionsCell = actionParts.length ? '<div class="row-actions">' + actionParts.join('') + '</div>' : '<span class="muted">&mdash;</span>';
         }
         previstoCell = r.afkChallengeDeadline ? '<span class="previsto" style="color:var(--accent-red);">Reportado AFK!</span>' : '<span class="previsto">Em andamento</span>';
       } else if(r.kind === 'calling'){
