@@ -111,6 +111,15 @@
   .modal-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
   .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;}
   .modal-actions .cancel{background:var(--pill-bg);color:var(--text-primary);border:1px solid var(--border);}
+  .afk-modal-box{max-width:460px;text-align:center;border-color:rgba(224,169,74,0.5);box-shadow:0 18px 60px rgba(0,0,0,0.45);}
+  .afk-modal-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(224,169,74,0.14);color:var(--accent-gold);font-size:25px;}
+  .afk-modal-box h3{font-size:19px;color:var(--text-primary);margin-bottom:10px;}
+  .afk-modal-box p{color:var(--text-secondary);font-size:13px;line-height:1.65;margin-bottom:4px;}
+  .afk-modal-box .modal-actions{margin-top:22px;}
+  .afk-modal-box .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-gold),var(--accent-teal));color:#0b0d12;}
+  .afk-modal-box .modal-actions .danger{background:rgba(226,87,76,0.14);color:var(--accent-red);border:1px solid rgba(226,87,76,0.4);}
+  .afk-modal-box.error{border-color:rgba(226,87,76,0.55);}
+  .afk-modal-box.error .afk-modal-icon{background:rgba(226,87,76,0.14);color:var(--accent-red);}
   .char-option{display:flex;align-items:center;gap:10px;background:var(--pill-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:10px;cursor:pointer;}
   .char-option input{margin:0;}
   .char-option.selected{border-color:var(--accent-teal);}
@@ -192,6 +201,15 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="afk-modal" role="dialog" aria-modal="true" aria-labelledby="afk-modal-title">
+  <div class="modal-box afk-modal-box" id="afk-modal-box">
+    <div class="afk-modal-icon" id="afk-modal-icon">&#128276;</div>
+    <h3 id="afk-modal-title">Confirmar Report AFK</h3>
+    <p id="afk-modal-message"></p>
+    <div class="modal-actions" id="afk-modal-actions"></div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="belobra-app.js"></script>
 <script>
@@ -203,6 +221,55 @@ let selectedCharacterId = null;
 let selectedServicePermissionId = null;
 let myVerifiedCharacters = [];
 let myCharacterIds = [];
+let afkModalResolver = null;
+let afkModalPreviousFocus = null;
+
+function closeAfkModal(result = false){
+  const modal = document.getElementById('afk-modal');
+  if(!modal || !modal.classList.contains('show')) return;
+  modal.classList.remove('show');
+  const previous = afkModalPreviousFocus;
+  afkModalPreviousFocus = null;
+  const resolve = afkModalResolver;
+  afkModalResolver = null;
+  if(previous && typeof previous.focus === 'function') previous.focus();
+  if(resolve) resolve(result);
+}
+
+function openAfkModal({ title, message, confirmText = 'Confirmar', cancelText = 'Cancelar', error = false }){
+  return new Promise(resolve => {
+    const modal = document.getElementById('afk-modal');
+    const box = document.getElementById('afk-modal-box');
+    const icon = document.getElementById('afk-modal-icon');
+    const titleEl = document.getElementById('afk-modal-title');
+    const messageEl = document.getElementById('afk-modal-message');
+    const actions = document.getElementById('afk-modal-actions');
+    if(!modal || !box || !icon || !titleEl || !messageEl || !actions){ resolve(false); return; }
+
+    if(afkModalResolver) closeAfkModal(false);
+    afkModalResolver = resolve;
+    afkModalPreviousFocus = document.activeElement;
+    box.classList.toggle('error', !!error);
+    icon.innerHTML = error ? '&#9888;' : '&#128276;';
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    actions.innerHTML = error
+      ? '<button type="button" class="confirm" data-afk-result="close">Entendi</button>'
+      : '<button type="button" class="cancel" data-afk-result="cancel">' + cancelText + '</button><button type="button" class="confirm" data-afk-result="confirm">' + confirmText + '</button>';
+    actions.querySelectorAll('[data-afk-result]').forEach(button => {
+      button.addEventListener('click', () => closeAfkModal(button.dataset.afkResult === 'confirm'));
+    });
+    modal.classList.add('show');
+    const firstButton = actions.querySelector('button');
+    if(firstButton) firstButton.focus();
+  });
+}
+
+document.addEventListener('keydown', event => {
+  if(event.key === 'Escape' && document.getElementById('afk-modal')?.classList.contains('show')){
+    closeAfkModal(false);
+  }
+});
 
 async function boot(){
   if(!respawnId){
@@ -525,7 +592,13 @@ async function endHunt(entryId){
   render();
 }
 async function reportAfk(entryId){
-  if(!confirm('Reportar esse jogador como AFK? Ele tera 5 minutos pra confirmar presenca, ou perde a vaga. Voce so pode fazer isso 1x por hora.')) return;
+  const confirmed = await openAfkModal({
+    title: 'Confirmar Report AFK',
+    message: 'O jogador será avisado e terá 5 minutos para confirmar presença. Você poderá fazer apenas um Report AFK por hora.',
+    confirmText: 'Confirmar Report AFK'
+  });
+  if(!confirmed) return;
+
   try{
     await belobraReportAfk(entryId);
     render();
@@ -538,7 +611,7 @@ async function reportAfk(entryId){
     } else if(msg.includes('APENAS_PROXIMO_DA_FILA')){
       msg = 'Somente o próximo jogador da fila pode reportar AFK nesta hunt.';
     }
-    alert(msg);
+    await openAfkModal({ title: 'Report AFK não realizado', message: msg, error: true });
     render();
   }
 }
@@ -547,7 +620,7 @@ async function confirmPresence(entryId){
     await belobraConfirmAfkPresence(entryId);
     render();
   }catch(e){
-    alert(e.message);
+    await openAfkModal({ title: 'Não foi possível confirmar', message: e.message || 'Tente novamente.', error: true });
   }
 }
 async function acceptVaga(entryId){
