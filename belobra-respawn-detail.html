@@ -67,7 +67,7 @@
   .btn-join:disabled{opacity:0.5;cursor:not-allowed;}
   .btn-join.discord{background:#5865F2;color:#fff;}
 
-  .queue-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+  .queue-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:visible;}
   .queue-panel-head{display:flex;align-items:center;gap:10px;padding:18px 22px;border-bottom:1px solid var(--border);font-weight:700;font-size:15px;}
   table{width:100%;border-collapse:collapse;}
   thead th{text-align:left;font-size:11px;color:var(--text-secondary);letter-spacing:0.5px;padding:14px 22px;border-bottom:1px solid var(--border);}
@@ -90,8 +90,9 @@
   .action-icon.report-trigger{color:var(--accent-gold);border-color:rgba(224,169,74,0.55);}
   .action-icon.claim-trigger{color:#c19aff;border-color:rgba(155,107,255,0.7);background:rgba(155,107,255,0.12);}
   .action-menu-wrap{position:relative;display:inline-flex;}
-  .action-menu{display:none;position:absolute;right:0;bottom:calc(100% + 9px);width:230px;padding:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 35px rgba(0,0,0,0.45);z-index:40;}
-  .action-menu.show{display:grid;gap:6px;}
+  .action-menu{display:none;position:absolute;right:0;top:calc(100% + 9px);bottom:auto;width:230px;padding:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;box-shadow:0 14px 35px rgba(0,0,0,0.45);z-index:40;}
+  .action-menu.show{display:grid;gap:6px;animation:action-menu-in .14s ease-out;}
+  @keyframes action-menu-in{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
   .action-menu button,.action-menu a{width:100%;display:flex;align-items:center;gap:10px;text-align:left;text-decoration:none;padding:9px 10px;border-radius:8px;border:1px solid transparent;background:var(--pill-bg);color:var(--text-primary);font:inherit;font-size:12px;font-weight:700;cursor:pointer;}
   .action-menu button:hover,.action-menu a:hover{border-color:var(--border);background:#252a36;}
   .action-menu .menu-icon{font-size:17px;width:22px;text-align:center;}
