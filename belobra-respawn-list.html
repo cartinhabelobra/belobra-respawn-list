@@ -294,6 +294,27 @@ let searchTerm = "";
 let sortMode = "padrao";
 let favorites = JSON.parse(localStorage.getItem('belobra_favorites') || '[]');
 
+function playSiren(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    const now = ctx.currentTime;
+    for(let i=0;i<4;i++){
+      osc.frequency.setValueAtTime(600, now + i*0.4);
+      osc.frequency.linearRampToValueAtTime(900, now + i*0.4 + 0.2);
+      osc.frequency.linearRampToValueAtTime(600, now + i*0.4 + 0.4);
+    }
+    osc.start(now);
+    osc.stop(now + 1.6);
+  }catch(e){ /* audio indisponivel */ }
+}
+let sirenPlayedFor = null;
+
 async function boot(){
   const respawns = await belobraGetRespawns();
   state = respawns.map(r => ({ id: r.id, name: r.name, favorite: favorites.includes(r.id) }));
@@ -309,6 +330,7 @@ async function renderMyStatus(){
 
   if(!entry){
     banner.innerHTML = '';
+    sirenPlayedFor = null;
     return;
   }
 
@@ -320,6 +342,11 @@ async function renderMyStatus(){
 
   if(entry.status === 'active' && entry.afkChallengeDeadline){
     isUrgent = true;
+    const afkKey = 'afk-' + entry.id + '-' + entry.afkChallengeDeadline;
+    if(sirenPlayedFor !== afkKey){
+      playSiren();
+      sirenPlayedFor = afkKey;
+    }
     const remain = Math.max(0, entry.afkChallengeDeadline - now);
     const m = Math.floor(remain / 60000);
     const s = Math.floor((remain % 60000) / 1000);
@@ -336,6 +363,11 @@ async function renderMyStatus(){
     timerHtml = `<span class="timer">&#9201; ${h}h ${m % 60}m restantes</span>`;
     actionBtn = `<button class="btn-leave" onclick="quickEndHunt(${entry.id})">Encerrar Hunt</button>`;
   } else if(entry.status === 'calling'){
+    const callKey = entry.id + '-' + entry.callDeadline;
+    if(sirenPlayedFor !== callKey){
+      playSiren();
+      sirenPlayedFor = callKey;
+    }
     const remain = Math.max(0, entry.callDeadline - now);
     const m = Math.floor(remain / 60000);
     const s = Math.floor((remain % 60000) / 1000);
