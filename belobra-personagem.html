@@ -83,6 +83,22 @@
   .verified-check{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--accent-teal);font-weight:700;font-size:14px;background:rgba(47,191,135,0.1);border:1px solid rgba(47,191,135,0.3);border-radius:10px;padding:14px;margin-bottom:16px;}
   .login-wall{text-align:center;padding:40px;color:var(--text-secondary);font-size:14px;}
   .login-wall button{margin-top:16px;background:#5865F2;color:#fff;border:none;padding:10px 20px;border-radius:20px;font-weight:700;cursor:pointer;}
+
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);
+    align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--bg-card);border:1px solid var(--border);border-radius:14px;
+    padding:26px;width:100%;max-width:360px;
+  }
+  .modal-box h3{font-size:16px;margin-bottom:12px;}
+  .confirm-modal-msg{font-size:14px;color:var(--text-secondary);line-height:1.6;}
+  .modal-actions{display:flex;gap:10px;margin-top:22px;}
+  .modal-actions button{flex:1;padding:11px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;border:none;}
+  .modal-actions .confirm{background:linear-gradient(90deg,var(--accent-red),var(--accent-gold));color:#0b0d12;}
+  .modal-actions .cancel{background:var(--pill-bg);color:var(--text-primary);border:1px solid var(--border);}
 </style>
 </head>
 <body>
@@ -104,9 +120,38 @@
   <div id="app-area"></div>
 </main>
 
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <h3 id="confirm-modal-title">Confirmar acao</h3>
+    <p id="confirm-modal-msg" class="confirm-modal-msg"></p>
+    <div class="modal-actions">
+      <button class="cancel" onclick="closeConfirmModal(false)">Cancelar</button>
+      <button class="confirm" id="confirm-modal-btn" onclick="closeConfirmModal(true)">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="belobra-app.js"></script>
 <script>
+let confirmModalResolve = null;
+
+function askConfirm(message){
+  return new Promise(resolve => {
+    confirmModalResolve = resolve;
+    document.getElementById('confirm-modal-msg').textContent = message;
+    document.getElementById('confirm-modal').classList.add('show');
+  });
+}
+
+function closeConfirmModal(result){
+  document.getElementById('confirm-modal').classList.remove('show');
+  if(confirmModalResolve){
+    confirmModalResolve(result);
+    confirmModalResolve = null;
+  }
+}
+
 let currentType = 'main';
 let servicePermissions = [];
 let serviceInvite = null;
@@ -265,7 +310,7 @@ async function acceptServiceInvite(){
 }
 
 async function revokeService(permissionId){
-  if(!confirm('Revogar esta autorização Service? A pessoa não poderá usar o personagem novamente.')) return;
+  if(!(await askConfirm('Revogar esta autorização Service? A pessoa não poderá usar o personagem novamente.'))) return;
   try{
     await belobraRevokeServicePermission(permissionId);
     servicePermissions = await belobraGetMyServicePermissions();

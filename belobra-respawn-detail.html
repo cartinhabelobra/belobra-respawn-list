@@ -600,7 +600,7 @@ async function openJoinModal(){
   }
 
   selectedServicePermissionId = null;
-  const availability = await belobraGetCharacterAvailability(myVerifiedCharacters.map(c => c.id));
+  const availability = await belobraGetCharacterAvailability(myVerifiedCharacters.map(c => c.id), respawnId);
 
   const myRole = await belobraGetMyRole();
   if(myRole === 'admin'){
@@ -624,8 +624,7 @@ async function openJoinModal(){
       let disabled = false;
 
       if(a.busy){
-        const withWho = (a.busyWith && a.busyWith !== c.name) ? ` (${escapeHtml(a.busyWith)} esta em uso)` : '';
-        noteHtml = `<span class="char-note busy">Sua conta ja esta em outra fila ou caçando${withWho}</span>`;
+        noteHtml = `<span class="char-note busy">${escapeHtml(a.busyWith || 'Indisponivel agora')}</span>`;
         disabled = true;
       } else if(a.cooldownUntil){
         noteHtml = `<span class="char-note cooldown" data-until="${a.cooldownUntil}">Em cooldown</span>`;
@@ -692,6 +691,12 @@ async function confirmJoin(){
       const dateStr = msg.split('BANIDO_TEMP:')[1];
       const date = new Date(dateStr);
       msg = `Sua conta esta banida do sistema de filas ate ${date.toLocaleString('pt-BR')}. Se acha que isso e um engano, abra um ticket de revisao na Central de Suporte.`;
+    } else if(msg.includes('CONTA_JA_CACANDO')){
+      msg = 'Sua conta ja esta caçando em outro respawn agora. Encerre a hunt atual antes de entrar em outra fila.';
+    } else if(msg.includes('LIMITE_DE_3_FILAS_SIMULTANEAS_ATINGIDO')){
+      msg = 'Sua conta ja atingiu o limite de 3 filas simultaneas.';
+    } else if(msg.includes('PERSONAGEM_JA_NA_FILA_DESSE_RESPAWN')){
+      msg = 'Esse personagem ja esta na fila desse respawn.';
     } else if(msg.includes('ja esta em uma fila')){
       msg = 'Sua conta (Main ou Maker) ja esta em outra fila ou caçando em outro respawn agora.';
     } else if(msg.includes('cooldown')){

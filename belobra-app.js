@@ -333,7 +333,7 @@ async function belobraLoadAllQueueStatus(){
 // se algum deles ja esta ocupado em qualquer fila/hunt, ou se a CONTA
 // esta de cooldown. Se estiver, TODOS os personagens da conta ficam
 // bloqueados (a regra vale pra conta inteira, nao so pra 1 personagem).
-async function belobraGetCharacterAvailability(characterIds){
+async function belobraGetCharacterAvailability(characterIds, currentRespawnId = null){
   const map = {};
   if(!characterIds.length) return map;
 
@@ -368,8 +368,13 @@ async function belobraGetCharacterAvailability(characterIds){
 
   const freshRows = await loadRows();
   const ownRows = freshRows.filter(r => r.queued_by_profile_id === user.id);
-  const accountBusy = ownRows.length > 0;
-  const ownBusyName = ownRows[0]?.characters?.name || null;
+  // So bloqueia a conta inteira se ela ja estiver CACANDO (active) em algum
+  // lugar, ou se ja tiver atingido o limite de 3 filas simultaneas.
+  const ownActiveRow = ownRows.find(r => r.status === 'active');
+  const accountBusy = !!ownActiveRow || ownRows.length >= 3;
+  const accountBusyReason = ownActiveRow
+    ? `Sua conta ja esta caçando com ${ownActiveRow.characters?.name || 'outro personagem'}`
+    : 'Sua conta ja atingiu o limite de 3 filas simultaneas';
   const usedByOther = {};
   freshRows.filter(r => r.queued_by_profile_id !== user.id).forEach(r => {
     usedByOther[r.character_id] = r.characters?.name || 'outro jogador';
@@ -385,9 +390,10 @@ async function belobraGetCharacterAvailability(characterIds){
 
   characterIds.forEach(id => {
     const otherName = usedByOther[id] || null;
+    const alreadyHere = currentRespawnId != null && ownRows.some(r => r.character_id === id && r.respawn_id === currentRespawnId);
     map[id] = {
-      busy: accountBusy || !!otherName,
-      busyWith: accountBusy ? ownBusyName : otherName,
+      busy: accountBusy || !!otherName || alreadyHere,
+      busyWith: accountBusy ? accountBusyReason : (alreadyHere ? 'Esse personagem ja esta nessa fila' : otherName),
       cooldownUntil: onCooldown ? cooldownUntil : null
     };
   });
