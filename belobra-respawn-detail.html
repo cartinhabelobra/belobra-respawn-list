@@ -506,7 +506,7 @@ async function render(){
         if(isMine && r.afkChallengeDeadline){
           const afkRemain = r.afkChallengeDeadline - now;
           actionsCell = '<div class="row-actions">' +
-            '<button class="btn-mini confirm-presence" onclick="confirmPresence(' + r.id + ')">Confirmar presenca (' + fmtCountdown(afkRemain) + ')</button></div>';
+            '<button class="btn-mini confirm-presence" onclick="confirmPresence(' + r.id + ')">Confirmar presenca (<span class="dynamic-afk-confirm" data-deadline="' + r.afkChallengeDeadline + '">' + fmtCountdown(afkRemain) + '</span>)</button></div>';
         } else if(isMine){
           actionsCell = '<button class="btn-mini end" onclick="endHunt(' + r.id + ')">Encerrar Hunt</button>';
         } else {
@@ -571,6 +571,9 @@ async function render(){
       });
       tbody.querySelectorAll('.dynamic-calling-time').forEach(el => {
         el.innerHTML = '&#9201; ' + fmtCountdown(Number(el.dataset.deadline) - now);
+      });
+      tbody.querySelectorAll('.dynamic-afk-confirm').forEach(el => {
+        el.textContent = fmtCountdown(Number(el.dataset.deadline) - now);
       });
     }
   }
